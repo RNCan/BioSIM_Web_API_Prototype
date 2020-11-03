@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Model version="3">
+    <Title>FallCankerworm</Title>
+    <Version>1.0</Version>
+    <ID>.ckw</ID>
+    <EXE>FallCankerworms.dll</EXE>
+    <Behaviour>0</Behaviour>
+    <Description>Model base on Porter (1924) The cankerworms data &#x0D;&#x0A;Calibrated only with 1 site (Wallingford, CT) and 2 years (1919-1920). &#x0D;&#x0A;Never validated</Description>
+    <WindowRect>0 0 96 391</WindowRect>
+    <SimulatedCategory>TN T TX</SimulatedCategory>
+    <TransferFileVersion>2</TransferFileVersion>
+    <SSI/>
+    <NbYearMin>1</NbYearMin>
+    <NbYearMax>999</NbYearMax>
+    <ThreadSafe>true</ThreadSafe>
+    <InputVariableArray>
+        <InputVariable>
+            <Name>Cumul</Name>
+            <Caption>Cumul</Caption>
+            <Description>Output values as cumulative</Description>
+            <Type>0</Type>
+            <Rect>15 15 35 285</Rect>
+            <SeparatorPos>100</SeparatorPos>
+            <DefaultValue>0</DefaultValue>
+            <MinValue>0</MinValue>
+            <MaxValue>1</MaxValue>
+            <TextValue/>
+        </InputVariable>
+    </InputVariableArray>
+    <OutputTypeMode>2 0</OutputTypeMode>
+    <MissingValue>-999</MissingValue>
+    <OutputVariableArray>
+        <OutputVariable>
+            <Name>DD</Name>
+            <Title>DD</Title>
+            <Units/>
+            <Description>Degree-Day </Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>Egg</Name>
+            <Title>Egg</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>L1</Name>
+            <Title>L1</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>L2</Name>
+            <Title>L2</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>L3</Name>
+            <Title>L3</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>L4</Name>
+            <Title>L4</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>L4soil</Name>
+            <Title>L4soil</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>Pupa</Name>
+            <Title>Pupa</Title>
+            <Units>%</Units>
+            <Description/>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>AI</Name>
+            <Title>AI</Title>
+            <Units/>
+            <Description>Average instar</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+    </OutputVariableArray>
+    <Copyright>WARNING: This model was never validated</Copyright>
+    <Credit>Model developed by Remi Saint-Amant based on continuing ratio&#x0D;&#x0A;&#x0D;&#x0A;Sources of code:&#x0D;&#x0A;https://github.com/RNCan/WeatherBasedSimulationFramework/tree/master/wbsModels/Cankerworms&#x0D;&#x0A;</Credit>
+    <HelpFileName/>
+</Model>

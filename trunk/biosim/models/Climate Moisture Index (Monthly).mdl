@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Model version="3">
+    <Title>Climate Moisture Index (Monthly)</Title>
+    <Version>1.0</Version>
+    <ID>.CMI</ID>
+    <EXE>Climate Moisture Index.dll</EXE>
+    <Behaviour>0</Behaviour>
+    <Description/>
+    <WindowRect>0 0 100 250</WindowRect>
+    <SimulatedCategory>TN T TX P</SimulatedCategory>
+    <TransferFileVersion>2</TransferFileVersion>
+    <SSI/>
+    <NbYearMin>1</NbYearMin>
+    <NbYearMax>999</NbYearMax>
+    <ThreadSafe>true</ThreadSafe>
+    <InputVariableArray>
+        <InputVariable>
+            <Name>LimitToZero</Name>
+            <Caption>Limit CMI to zero</Caption>
+            <Description/>
+            <Type>0</Type>
+            <Rect>10 10 30 210</Rect>
+            <SeparatorPos>100</SeparatorPos>
+            <DefaultValue>0</DefaultValue>
+            <MinValue>0</MinValue>
+            <MaxValue>1</MaxValue>
+            <TextValue/>
+        </InputVariable>
+    </InputVariableArray>
+    <OutputTypeMode>1 0</OutputTypeMode>
+    <MissingValue>-9999</MissingValue>
+    <OutputVariableArray>
+        <OutputVariable>
+            <Name>TMaxMean</Name>
+            <Title>TMaxMean</Title>
+            <Units>°C</Units>
+            <Description>Mean maximum daily temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>TminMean</Name>
+            <Title>TminMean</Title>
+            <Units>°C</Units>
+            <Description>Mean minimum daily temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>PptSum</Name>
+            <Title>PptSum</Title>
+            <Units>cm</Units>
+            <Description>Sum of precipitation</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>PetSum</Name>
+            <Title>PetSum</Title>
+            <Units>cm</Units>
+            <Description>Sum of evapotranspiration with Hogg 1997 method</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>CMI</Name>
+            <Title>CMI</Title>
+            <Units>cm</Units>
+            <Description>Climate Moisture Index</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+    </OutputVariableArray>
+    <Copyright/>
+    <Credit/>
+    <HelpFileName/>
+</Model>
