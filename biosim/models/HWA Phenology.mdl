@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Model version="3">
+    <Title>CHemlockWoollyAdelgidCMModel</Title>
+    <Version>1.0</Version>
+    <ID/>
+    <EXE>HWA Phenology.dll</EXE>
+    <Behaviour>0</Behaviour>
+    <Description/>
+    <WindowRect>0 0 100 250</WindowRect>
+    <SimulatedCategory>TN T TX</SimulatedCategory>
+    <TransferFileVersion>2</TransferFileVersion>
+    <SSI/>
+    <NbYearMin>1</NbYearMin>
+    <NbYearMax>999</NbYearMax>
+    <ThreadSafe>true</ThreadSafe>
+    <InputVariableArray/>
+    <OutputTypeMode>2 0</OutputTypeMode>
+    <MissingValue>-999</MissingValue>
+    <OutputVariableArray>
+        <OutputVariable>
+            <Name>CDD</Name>
+            <Title>CDD</Title>
+            <Units/>
+            <Description>Cumulative DD over 4.0 °C after January fist</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>P_Eggs</Name>
+            <Title>ProgredientEggs</Title>
+            <Units/>
+            <Description>Progradiens eggs</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>P_Brood</Name>
+            <Title>ProgradientBrood</Title>
+            <Units/>
+            <Description>Progradiens newly eggs brooded</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>P_EggHatch</Name>
+            <Title>ProgradientEggHatch</Title>
+            <Units/>
+            <Description>Progradiens newly egg hatched</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>S_EggHatch</Name>
+            <Title>SistensEggHatch</Title>
+            <Units/>
+            <Description>Sistens newly egg hatched </Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>S_SettledL1</Name>
+            <Title>SistensSettledL1</Title>
+            <Units/>
+            <Description>Sistens newly first instar settled </Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>P_Brood_Cumul</Name>
+            <Title>ProgradientBroodCumul</Title>
+            <Units>%</Units>
+            <Description>Progradiens cumul eggs brooded</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>P_EggHatch_Cumul</Name>
+            <Title>ProgradientEggHatchCumul</Title>
+            <Units>%</Units>
+            <Description>Progradiens cumul egg hatched</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>S_EggHatch_Cumul</Name>
+            <Title>SistensHatchCumul</Title>
+            <Units>%</Units>
+            <Description>Sistens cumul egg hatched </Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>S_SettledL1_Cumul</Name>
+            <Title>SistensSettledL1Cumul</Title>
+            <Units>%</Units>
+            <Description>Sistens cumul first instar settled </Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+    </OutputVariableArray>
+    <Copyright/>
+    <Credit>Phenology of Hemlock Woolly Adelgid (Hemiptera: Adelgidae) in the Central Appalachian Mountains, USA&#x0D;&#x0A;Patrick C. Tobin and Richard M. Turcotte</Credit>
+    <HelpFileName/>
+</Model>

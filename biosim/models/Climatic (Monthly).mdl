@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Model version="3">
+    <Title>Climatic Monthly</Title>
+    <Version>2.0</Version>
+    <ID>.cmt</ID>
+    <EXE>Climatic.dll</EXE>
+    <Behaviour>0</Behaviour>
+    <Description>This model compute climatic variable by month</Description>
+    <WindowRect>0 0 95 386</WindowRect>
+    <SimulatedCategory>TN T TX P TD H R</SimulatedCategory>
+    <TransferFileVersion>2</TransferFileVersion>
+    <SSI/>
+    <NbYearMin>1</NbYearMin>
+    <NbYearMax>999</NbYearMax>
+    <ThreadSafe>true</ThreadSafe>
+    <InputVariableArray>
+        <InputVariable>
+            <Name>PrcpThreshold</Name>
+            <Caption>PrcpThreshold</Caption>
+            <Description>Precipitation threshold to determine if it's a wet or dry day. 0.2 mm by default. Annual and monthly only</Description>
+            <Type>2</Type>
+            <Rect>20 10 40 160</Rect>
+            <SeparatorPos>100</SeparatorPos>
+            <DefaultValue>0.2</DefaultValue>
+            <MinValue>0</MinValue>
+            <MaxValue>10</MaxValue>
+            <TextValue/>
+        </InputVariable>
+    </InputVariableArray>
+    <OutputTypeMode>1 0</OutputTypeMode>
+    <MissingValue>-9999</MissingValue>
+    <OutputVariableArray>
+        <OutputVariable>
+            <Name>LowestTmin</Name>
+            <Title>LowestTmin</Title>
+            <Units>°C</Units>
+            <Description>Lowest daily minimum temperature of the month</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MeanTmin</Name>
+            <Title>MeanTmin</Title>
+            <Units>°C</Units>
+            <Description>Monthly mean of daily minimum temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MeanTair</Name>
+            <Title>MeanTair</Title>
+            <Units>°C</Units>
+            <Description>Monthly mean of daily mean temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MeanTmax</Name>
+            <Title>MeanTmax</Title>
+            <Units>°C</Units>
+            <Description>Monthly mean of daily maximum temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>HighestTmax</Name>
+            <Title>HighestTmax</Title>
+            <Units>°C</Units>
+            <Description>Highest daily maximum temperature of the month</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>TotalPrcp</Name>
+            <Title>Total Prcp</Title>
+            <Units>mm</Units>
+            <Description>Monthly total precipitation</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MeanTdew</Name>
+            <Title>MeanTdew</Title>
+            <Units>°C</Units>
+            <Description>Monthly mean of daily mean dew point temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MeanRelH</Name>
+            <Title>MeanRelH</Title>
+            <Units>%</Units>
+            <Description>Monthly mean of daily mean relative humidity</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>TotalRadiation</Name>
+            <Title>TotalRadiation</Title>
+            <Units>MJ/m²</Units>
+            <Description>Monthly total radiation computes by MTCLIM. See documentation of MTCLIM 4.3</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>FrostDay</Name>
+            <Title>FrostDay</Title>
+            <Units>days</Units>
+            <Description>Number of days in the year when the daily minimum temperature is &lt; 0 °C</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>FrostFreeDay</Name>
+            <Title>FrostFreeDay</Title>
+            <Units>days</Units>
+            <Description>Number of days in the year when the daily minimum temperature is &gt;= 0 °C</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>WetDay</Name>
+            <Title>WetDay</Title>
+            <Units>days</Units>
+            <Description>Number of days in the year when the daily precipitation is &gt;= 0.2 mm</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>DryDay</Name>
+            <Title>DryDay</Title>
+            <Units>days</Units>
+            <Description>Number of days in the year when the daily precipitation is &lt; 0.2 mm</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+    </OutputVariableArray>
+    <Copyright/>
+    <Credit> Version                Date                           Note&#x0A;2.3 (2013)        05/07/2013          Remove GDD and ET&#x0A;</Credit>
+    <HelpFileName/>
+</Model>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Model version="3">
+    <Title>Emerald Ahs Borer COld Hardiness</Title>
+    <Version>1.0</Version>
+    <ID/>
+    <EXE>EmeraldAshBorerColdHardiness.dll</EXE>
+    <Behaviour>0</Behaviour>
+    <Description>Emerald Ahs Borer phenology</Description>
+    <WindowRect>0 0 100 250</WindowRect>
+    <SimulatedCategory>TN T TX</SimulatedCategory>
+    <TransferFileVersion>2</TransferFileVersion>
+    <SSI/>
+    <NbYearMin>2</NbYearMin>
+    <NbYearMax>999</NbYearMax>
+    <ThreadSafe>true</ThreadSafe>
+    <InputVariableArray/>
+    <OutputTypeMode>0 0</OutputTypeMode>
+    <MissingValue>-999</MissingValue>
+    <OutputVariableArray>
+        <OutputVariable>
+            <Name>TairMin</Name>
+            <Title>TairMin</Title>
+            <Units>°C</Units>
+            <Description>Annual minimum air temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>TbarkMinLinear</Name>
+            <Title>TbarkMinLinear</Title>
+            <Units>°C</Units>
+            <Description>Annual minimum under-bark temperature estimate with linear regression</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>1</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>TbarkMinNonlinear</Name>
+            <Title>TbarkMinNonlinear</Title>
+            <Units>°C</Units>
+            <Description>Annual minimum under-bark temperature estimate with nonlinear regression</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MortalityLinear</Name>
+            <Title>MortalityLinear</Title>
+            <Units>%</Units>
+            <Description>Annual mortality estimate with linear underbark temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>2</Precision>
+        </OutputVariable>
+        <OutputVariable>
+            <Name>MortalityNonlinear</Name>
+            <Title>MortalityNonlinear</Title>
+            <Units/>
+            <Description>Winter mortality estimate with nonlinear underbark temperature</Description>
+            <TimeMode>4 0</TimeMode>
+            <Precision>4</Precision>
+        </OutputVariable>
+    </OutputVariableArray>
+    <Copyright>WARNING: this model was never validated</Copyright>
+    <Credit>Developed by Remi Saint-Amant from Cuddington 2018 publication&#x0D;&#x0A;Under-bark temperature Newtonian model based on Vermunt 2012</Credit>
+    <HelpFileName/>
+</Model>
