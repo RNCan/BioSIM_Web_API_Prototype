@@ -1,0 +1,3 @@
+include LICENSE README.txt
+graft biosim/biosimdll
+graft biosim/models
