@@ -164,7 +164,10 @@ class Server:
         Generates the proper list of BioSimNormalsAndWeatherGeneratorWrapper instances given the RCP and climate model.
         '''
         outputList = list()
-        outputList.extend(self.weatherGen.get(RCP.PastClimate))
+        if request.isForceClimateGenerationEnabled():
+            outputList.extend(self.normals.get(RCP.PastClimate).values())    ### here we pass the normals because they cover the whole time frame
+        else:
+            outputList.extend(self.weatherGen.get(RCP.PastClimate))
         if request.getRCP() != RCP.PastClimate:
             values = self.weatherGen.get(request.getRCP()).get(request.getClimateModel())
             outputList.extend(values)

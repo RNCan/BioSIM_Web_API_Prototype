@@ -17,5 +17,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=["flask", "waitress"],
+    install_requires=["flask", "waitress", "itsdangerous", "jinja2", "markupsafe", "six", "werkzeug"],
 )

@@ -492,10 +492,10 @@ class WeatherGeneratorRequest(AbstractRequest):
 
 
     def doesThisContextMatch(self, context : Context):
-        if len(self.contextDict) > 0:
+        if len(self.contextDict) > 0:       ### some contexts already match
             values = list(self.contextDict.values())
             lastValue = values[-1]
-            initDateYr = lastValue[1] + 1
+            initDateYr = lastValue[1] + 1   ### the initial date is then set to the last date that matches + 1
         else:
             initDateYr = self.dict.get("from")
         finalDateYr = self.dict.get("to")
