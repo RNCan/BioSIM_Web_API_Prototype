@@ -20,6 +20,7 @@ from biosim.bssettings import Context, Shore, Normals, Daily, DEM, Gribs, Climat
     CurrentDailyHandler, Settings
 from biosim.bswrappers import BioSimNormalsAndWeatherGeneratorWrapper
 
+PastClimateGeneration = "PastClimateForGeneration"
 
 class Server:
     '''
@@ -103,6 +104,7 @@ class Server:
         
         self.weatherGen = dict()
         self.weatherGen.__setitem__(RCP.PastClimate, list())
+        self.weatherGen.__setitem__(PastClimateGeneration, list())
         self.weatherGen.__setitem__(RCP.RCP45, self.setClimateModelsInDict(False)) ### false a list and not a dict
         self.weatherGen.__setitem__(RCP.RCP85, self.setClimateModelsInDict(False)) ### false a list and not a dict
  
@@ -117,6 +119,11 @@ class Server:
                 self.lastDailyDate = finalDate;
             wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
             self.weatherGen.get(RCP.PastClimate).append(wrapper)
+        
+        for norm in pastClimateNormals:         ### those serve for the climate generation. The wrapper for the normals dict cannot be used since the weather generation interferes with the normals
+            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+            wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
+            self.weatherGen.get(PastClimateGeneration).append(wrapper)
             
         for norm in hadley45:
             context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
@@ -165,8 +172,8 @@ class Server:
         '''
         outputList = list()
         if request.isForceClimateGenerationEnabled():
-            outputList.extend(self.normals.get(RCP.PastClimate).values())    ### here we pass the normals because they cover the whole time frame
-        else:
+            outputList.extend(self.weatherGen.get(PastClimateGeneration))
+        else:    
             outputList.extend(self.weatherGen.get(RCP.PastClimate))
         if request.getRCP() != RCP.PastClimate:
             values = self.weatherGen.get(request.getRCP()).get(request.getClimateModel())
