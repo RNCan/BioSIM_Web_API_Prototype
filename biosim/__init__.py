@@ -242,7 +242,7 @@ def create_app(test_config=None):
 if __name__ == "__main__":
     Settings.SimpleMode = True   ### enabling multiprocessing
     print("Name set to " + str(__name__))
-    print("Enabling multiprocessing")
+    print("Disabling multiprocessing")
     app = create_app()        
     server = Server()                               ### if running in simple mode then there is no multiprocessing
     serve(TransLogger(create_app(), setup_console_handler=True), listen='0.0.0.0:5001', ident="biosim")
