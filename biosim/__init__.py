@@ -240,12 +240,12 @@ def create_app(test_config=None):
 
 
 if __name__ == "__main__":
-    Settings.SimpleMode = False   ### enabling multiprocessing
+    Settings.SimpleMode = True   ### enabling multiprocessing
     print("Name set to " + str(__name__))
     print("Enabling multiprocessing")
     app = create_app()        
     server = Server()                               ### if running in simple mode then there is no multiprocessing
-    serve(TransLogger(create_app(), setup_console_handler=True), listen='0.0.0.0:5000', ident="biosim")
+    serve(TransLogger(create_app(), setup_console_handler=True), listen='0.0.0.0:5001', ident="biosim")
 elif __name__ == "__biosim__":
     Settings.SimpleMode = True
     print("Name set to " + str(__name__))
