@@ -356,6 +356,11 @@ class SimpleModelRequest(AbstractRequest):
                                                      
         return requestString
     
+    def getNumberModelReplications(self):
+        if self.dict.__contains__("repmodel"):
+            return self.dict.get("repmodel")
+        else:
+            return 1
 
 class ModelRequest(SimpleModelRequest):
     '''
