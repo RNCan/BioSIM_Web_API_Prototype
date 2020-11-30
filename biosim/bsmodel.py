@@ -119,7 +119,7 @@ class Model():
             for i in range(nbLocations):
                 modelOutput = mainDict[i]
                 mow = ModelOutputWrapper()
-                mow.__reconvertFromDict__(modelOutput)
+                mow.__reconvertFromDict__(modelOutput, bioSimRequest)
                 outputs.append(mow)
         else:
             for i in range(nbLocations):
@@ -130,7 +130,7 @@ class Model():
                     teleIOOutput = self.innerModel.Execute(parms, wgout)
                     outputForThisPlot.append(teleIOOutput) 
                 mow = ModelOutputWrapper()
-                mow.setModelOutput(outputForThisPlot, wgoutWrapper)
+                mow.setModelOutput(outputForThisPlot, wgoutWrapper, bioSimRequest)
                 outputs.append(mow)
         return outputs
 
@@ -146,19 +146,19 @@ class ModelOutputWrapper:
     def __init__(self):
         self.outputForThisPlot = []
 
-    def setModelOutput(self, outputForThisPlot, ww: WgoutWrapper):
+    def setModelOutput(self, outputForThisPlot, ww: WgoutWrapper, bioSimRequest : ModelRequest):
         self.outputForThisPlot = outputForThisPlot
         self.initialDateYr = ww.getInitialDateYr()
         self.finalDateYr = ww.getFinalDateYr()
-        self.nbRep = ww.getNbRep()
+        self.nbRep = ww.getNbRep() * bioSimRequest.getNumberModelReplications() 
         self.lastDailyDate = ww.lastDailyDate
        
-    def __reconvertFromDict__(self, d : dict):
+    def __reconvertFromDict__(self, d : dict, bioSimRequest : ModelRequest):
         for wgout in d["outputForThisPlot"]:
             self.outputForThisPlot.append(BioSimUtility.convertDictToTeleIO(wgout))
         self.initialDateYr = d["initDateYr"]
         self.finalDateYr = d["finalDateYr"]
-        self.nbRep = d["nbRep"]
+        self.nbRep = d["nbRep"] * bioSimRequest.getNumberModelReplications()
         self.lastDailyDate = d["lastDailyDate"]
        
 #     def processRequest(self, ww : WgoutWrapper, model : Model, bioSimRequest : ModelRequest):    
