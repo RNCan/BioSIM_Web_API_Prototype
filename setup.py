@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name="biosim",
-    version="1.0.1",
+    version="1.0.2",
     url="https://sourceforge.net/p/mrnfforesttools/biosimclient/wiki/MainPage/",
     license="LGPL 3.0",
     maintainer="Mathieu Fortin",

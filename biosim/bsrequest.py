@@ -103,7 +103,7 @@ class AbstractRequest:
         """
         
         listDoubleParsed = ["lat", "long", "elev"]
-        listIntParsed = ["from", "to", "compress", "rep", "nb_nearest_neighbor"]
+        listIntParsed = ["from", "to", "compress", "rep", "nb_nearest_neighbor", "repmodel"]
         errMsg = ""
         newDict = {}
         self.n = None
@@ -336,13 +336,21 @@ class SimpleModelRequest(AbstractRequest):
             self.mod = ModelType[modelName]
         except:
             errMsg = self.updateErrMsg(errMsg, "Model " + modelName + " does not exist")
+
+        if d.__contains__("repmodel"):
+            repModelValue = d.get("repmodel")
+            if repModelValue < 1:
+                errMsg = self.updateErrMsg(errMsg, "the repmodel parameter must be equal to or greater than 1")
+
         return errMsg
 
     def parseRequest(self, i, context : Context):
         requestString = ""
         requestString += "compress=0"  # no compression 
-#         if self.dict.__contains__("rep"):
-#             requestString += "&Replications=" + str(self.dict.get("rep"))
+        
+        if self.dict.__contains__("repmodel"):
+            requestString += "&Replications=" + str(self.dict.get("repmodel"))
+            
         if self.dict.__contains__("Parameters"):
             requestString += "&Parameters=" + str(self.dict.get("Parameters")).replace("*","+")  
                                                      
@@ -415,16 +423,6 @@ class WeatherGeneratorRequest(AbstractRequest):
             if repValue < 1:
                 errMsg = self.updateErrMsg(errMsg, "the rep parameter must be equal to or greater than 1")
 
-#         if d.__contains__("nb_years"):
-#             nbYearsValue = d.get("nb_years")
-#             if nbYearsValue < 1:
-#                 errMsg = self.updateErrMsg(errMsg, "the nb_years parameter must be equal to or greater than 1")
-
-#         if d.__contains__("export"):
-#             exportValue = d.get("export")
-#             if exportValue < 0 or exportValue > 1:
-#                 errMsg = self.updateErrMsg(errMsg, "the export parameter must be equal to 0 (kept in memory on the server) or 1 (exported to the client)")
-
         startDate = d.get("from")
         endDate = d.get("to")
         if startDate > endDate:
@@ -444,15 +442,6 @@ class WeatherGeneratorRequest(AbstractRequest):
             elif nbStations < 1 or nbStations > 35:
                 errMsg = self.updateErrMsg(errMsg, "the nb_nearest_neighbor must be an integer ranging from 1 to 35")
          
-#         if d.__contains__("out"):  ### maybe obsolete
-#             outputPreference = d.get("out")
-#             if outputPreference not in typeOutputList:
-#                 errMsg = self.updateErrMsg(errMsg, "the out parameter must be either h (hourly) or d (daily)")    
-# 
-#         if d.__contains__("gen"):   ### maybe obsolete
-#             generatorPreference = d.get("gen")
-#             if generatorPreference not in typeGenList:
-#                 errMsg = self.updateErrMsg(errMsg, "the gen parameter must be either des (desaggregated), obs (observed) or gribs (mapped data)")    
         return errMsg
     
     
