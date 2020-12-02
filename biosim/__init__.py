@@ -6,7 +6,7 @@ Entry point of the biosim module.
 '''
 from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelRequest , AbstractRequest, \
     WeatherGeneratorEpheremalRequest, BioSimRequestException, \
-    SimpleModelRequest
+    SimpleModelRequest, TeleIODictList
 from biosim.bsserver import Server
 from biosim.bssettings import Settings
 from biosim.bsutility import WgoutWrapper, BioSimUtility
@@ -47,7 +47,7 @@ def create_app(test_config=None):
         parms = request.args
         try:
             references = parms.get("ref").split()
-            AbstractRequest.removeTeleIOObjects(references)
+            TeleIODictList.removeTeleIODictList(references)
             return "Done"
         except Exception as error:
             return make_response(str(error), 500)
@@ -59,33 +59,15 @@ def create_app(test_config=None):
         parms = request.args
         try:
             bioSimRequest = WeatherGeneratorEpheremalRequest(parms)
-            outputs = server.processRequest(bioSimRequest)
-            if bioSimRequest.isForceClimateGenerationEnabled():
-                lastDailyDate = -999                            # means climate is generated even for past dates
-            else:
-                lastDailyDate = server.lastDailyDate            # means we are using observation
-            strOutput = ""
-            for i in range(bioSimRequest.n):
-                listForThisPlot = []
-                for context in outputs.keys():
-                    wgout = outputs.get(context)[i]
-                    listForThisPlot.append(wgout)
-                wgoutWrapper = WgoutWrapper(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate)
-                bioSimRequest.storeWgoutWrapper(wgoutWrapper)
+            teleIODictList = doWeatherGeneration(bioSimRequest)
+            bioSimRequest.storeTeleIODictList(teleIODictList)
                 
             bioSimRequest.weatherGenerated = True
-            outputsList = server.doProcessModelRequest(bioSimRequest)
+            modelResultTeleIODictList = server.doProcessModelRequest(bioSimRequest)
             if bioSimRequest.isJSONFormatRequested():
-                mainDict = dict()
-                for i in range(bioSimRequest.n):
-                    modelOutputWrapper = outputsList[i] 
-                    mainDict.__setitem__(i, modelOutputWrapper.parseOutputToDict())
-                return jsonify(mainDict)
+                return jsonify(modelResultTeleIODictList.parseToJSON())
             else:
-                strOutput = ""
-                for modelOutputWrapper in outputsList: 
-                    strOutput += modelOutputWrapper.parseOutputToString()
-                return strOutput 
+                return modelResultTeleIODictList.getOutputText()
         except Exception as error:
             if isinstance(error, BioSimRequestException):
                 return make_response(str(error), 400)
@@ -97,25 +79,26 @@ def create_app(test_config=None):
         return biosimModelEphemeral()
 
     
+    def doWeatherGeneration(bioSimRequest : WeatherGeneratorRequest):
+        '''
+        Perform the weather generation and returns a TeleIODictList instance
+        '''
+        outputs = server.processRequest(bioSimRequest)
+        if bioSimRequest.isForceClimateGenerationEnabled():
+            outputs.setLastDailyDate(-999)      # means climate is generated even for past dates
+        else:
+            outputs.setLastDailyDate(server.lastDailyDate)     # means we are using observation
+        return outputs
+    
+    
     @app.route('/BioSimWG')
     def biosimWG():
         parms = request.args
         try:
             bioSimRequest = WeatherGeneratorRequest(parms)
-            outputs = server.processRequest(bioSimRequest)
-            if bioSimRequest.isForceClimateGenerationEnabled():
-                lastDailyDate = -999                            # means climate is generated even for past dates
-            else:
-                lastDailyDate = server.lastDailyDate            # means we are using observation
-            strOutput = ""
-            for i in range(bioSimRequest.n):
-                listForThisPlot = []
-                for context in outputs.keys():
-                    wgout = outputs.get(context)[i]
-                    listForThisPlot.append(wgout)
-                
-                strOutput += AbstractRequest.registerTeleIOObjects(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate) + " "
-            return strOutput
+            teleIODictList = doWeatherGeneration(bioSimRequest)
+            keysToLibrary = teleIODictList.registerTeleIODictList()
+            return keysToLibrary
         
         except Exception as error:
             if isinstance(error, BioSimRequestException):
@@ -171,18 +154,11 @@ def create_app(test_config=None):
         parms = request.args
         try:
             bioSimRequest = ModelRequest(parms)
-            outputsList = server.processRequest(bioSimRequest)
+            modelResultTeleIODictList = server.processRequest(bioSimRequest)
             if bioSimRequest.isJSONFormatRequested():
-                mainDict = dict()
-                for i in range(bioSimRequest.n):
-                    modelOutputWrapper = outputsList[i] 
-                    mainDict.__setitem__(i, modelOutputWrapper.parseOutputToDict())
-                return jsonify(mainDict)
+                return jsonify(modelResultTeleIODictList.parseToJSON())
             else:
-                strOutput = ""
-                for modelOutputWrapper in outputsList: 
-                    strOutput += modelOutputWrapper.parseOutputToString()
-                return strOutput 
+                return modelResultTeleIODictList.getOutputText()
         except Exception as error:
             if isinstance(error, BioSimRequestException):
                 return make_response(str(error), 400)
@@ -240,7 +216,7 @@ def create_app(test_config=None):
 
 
 if __name__ == "__main__":
-    Settings.SimpleMode = True   ### enabling multiprocessing
+    Settings.SimpleMode = True   ### disabling multiprocessing
     print("Name set to " + str(__name__))
     print("Disabling multiprocessing")
     app = create_app()        
