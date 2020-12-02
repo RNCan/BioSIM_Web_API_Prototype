@@ -7,7 +7,7 @@ Handle the different model types and the instantiation of models in BioSIM.
 from multiprocessing import Queue, Process, Lock
 
 from biosim.bssettings import ModelType, Settings
-from biosim.bsrequest import ModelRequest
+from biosim.bsrequest import ModelRequest, TeleIODict, TeleIODictList
 from biosim.bsutility import WgoutWrapper, BioSimUtility
 import biosim.biosimdll.BioSIM_API as BioSIM_API
 
@@ -100,8 +100,9 @@ class Model():
         return self.defaultParameters
     
     def doProcess(self, bioSimRequest : ModelRequest):
-        outputs = []
-        nbLocations = len(bioSimRequest.wgoutsList)
+        outputTeleIODictList = TeleIODictList()
+        inputTeleIODictList = bioSimRequest.teleIODictList
+        nbLocations = len(inputTeleIODictList)
         if self.modelType.isMultiProcessEnabled():
             mainDict = dict()
             self.lock.acquire()     ### To avoid concurrent feeding of the taskToDo queue
@@ -120,19 +121,15 @@ class Model():
                 modelOutput = mainDict[i]
                 mow = ModelOutputWrapper()
                 mow.__reconvertFromDict__(modelOutput, bioSimRequest)
-                outputs.append(mow)
+                outputTeleIODictList.append(mow)
         else:
             for i in range(nbLocations):
-                outputForThisPlot = []
                 parms = bioSimRequest.parseRequest(0, None)
-                wgoutWrapper = bioSimRequest.wgoutsList[i]
-                for wgout in wgoutWrapper.getWgouts():
-                    teleIOOutput = self.innerModel.Execute(parms, wgout)
-                    outputForThisPlot.append(teleIOOutput) 
-                mow = ModelOutputWrapper()
-                mow.setModelOutput(outputForThisPlot, wgoutWrapper, bioSimRequest)
-                outputs.append(mow)
-        return outputs
+                lastDailyDate = inputTeleIODictList[i]["lastDailyDate"]
+                wgout = inputTeleIODictList.getTeleIO(i)
+                teleIOOutput = self.innerModel.Execute(parms, wgout)
+                outputTeleIODictList.append(TeleIODict(teleIOOutput, lastDailyDate, False))
+        return outputTeleIODictList
 
     def getRequiredVariables(self):
             return self.climateVariableNeeded

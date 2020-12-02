@@ -33,6 +33,7 @@ class BioSimUtility():
         teleIOobj = BioSIM_API.teleIO(d["compress"], d["msg"], d["comment"], d["metadata"], d["text"], d["data"])
         return teleIOobj
 
+
     @staticmethod
     def convertTeleIOTextToList(text : str):
         outputList = list()
@@ -48,8 +49,8 @@ class BioSimUtility():
             outputList.append(obsDict)
         return outputList
 
-        
 
+    
 class WgoutWrapper:
     
     def __init__(self, obj, initDateYr, finalDateYr, nbRep, lastDailyDate):

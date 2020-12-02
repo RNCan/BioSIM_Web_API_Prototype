@@ -46,7 +46,7 @@ def create_app(test_config=None):
         parms = request.args
         try:
             references = parms.get("ref").split()
-            AbstractRequest.removeTeleIOObjects(references)
+            AbstractRequest.removeTeleIODictList(references)
             return "Done"
         except Exception as error:
             return make_response(str(error), 500)
@@ -113,7 +113,7 @@ def create_app(test_config=None):
                     wgout = outputs.get(context)[i]
                     listForThisPlot.append(wgout)
                 
-                strOutput += AbstractRequest.registerTeleIOObjects(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate) + " "
+                strOutput += AbstractRequest.registerTeleIODictList(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate) + " "
             return strOutput
         
         except Exception as error:

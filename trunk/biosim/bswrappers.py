@@ -10,8 +10,8 @@ from multiprocessing import Process, Queue
 from threading import Lock
 
 from biosim.bssettings import Context, Settings
-from biosim.bsrequest import NormalsRequest, AbstractRequest, WeatherGeneratorRequest
-from biosim.bsutility import BioSimUtility
+from biosim.bsrequest import NormalsRequest, AbstractRequest, WeatherGeneratorRequest, TeleIODictList, TeleIODict
+from biosim.bsutility import BioSimUtility 
 import biosim.biosimdll.BioSIM_API as BioSIM_API
 
 
@@ -138,13 +138,14 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
         '''
         Process the request whether it is a request for normals or weather generation. The
         class of the AbstractRequest instance allows distinguishing the type of request. 
+        Return a list of teleIO objects.
         '''
         if isinstance(bioSimRequest, NormalsRequest):
-            output = []
+            teleIODictList = [] #### TODO fix this as well
             for i in range(bioSimRequest.n):
-                output.append(self.WG.GetNormals(bioSimRequest.parseRequest(i, self.context))) 
+                teleIODictList.append(self.WG.GetNormals(bioSimRequest.parseRequest(i, self.context))) 
         elif isinstance(bioSimRequest, WeatherGeneratorRequest):
-            output = []
+            teleIODictList = TeleIODictList()
             if (self.context.isMultiProcessEnabled()):
                 mainDict = dict()
                 self.lock.acquire()     ### To avoid concurrent feeding of the taskToDo queue
@@ -159,11 +160,12 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
                     mainDict[naturalOrder] = BioSimUtility.convertDictToTeleIO(teleIOinDict)
                 self.lock.release()      ### release the lock for other threads
                 for i in range(bioSimRequest.n):
-                    output.append(mainDict[i])
+                    teleIODictList.append(mainDict[i])  ### TODO this does not work any mode
             else:
                 for i in range(bioSimRequest.n):
                     WGout = self.WG.Generate(bioSimRequest.parseRequest(i, self.context))
-                    output.append(WGout)
-        return output
+                    datesYr = bioSimRequest.getDatesYr(self.context)
+                    teleIODictList.append(TeleIODict(WGout, datesYr[1]))
+        return teleIODictList
 
         

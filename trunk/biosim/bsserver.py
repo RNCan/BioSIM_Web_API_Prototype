@@ -15,7 +15,7 @@ import zipfile
 
 from biosim.bsmodel import Model
 from biosim.bsrequest import AbstractRequest, ModelRequest, WeatherGeneratorRequest, NormalsRequest, \
-    WeatherGeneratorEpheremalRequest
+    WeatherGeneratorEpheremalRequest, TeleIODictList
 from biosim.bssettings import Context, Shore, Normals, Daily, DEM, Gribs, ClimateModel, RCP, ModelType, \
     CurrentDailyHandler, Settings
 from biosim.bswrappers import BioSimNormalsAndWeatherGeneratorWrapper
@@ -195,15 +195,16 @@ class Server:
             if isinstance(bioSimRequest, WeatherGeneratorEpheremalRequest):
                 model = self.models.get(bioSimRequest.mod)
                 bioSimRequest.setVariables(model.getRequiredVariables())
-            tmpDict = dict()
+            teleIODictList = TeleIODictList()
             wrapperList = self.getWrapperForWeatherGeneration(bioSimRequest)
             for wrapper in wrapperList:
                 context = wrapper.getContext()
                 if (bioSimRequest.doesThisContextMatch(context)):
-                    output = wrapper.doProcess(bioSimRequest)
-                    tmpDict.__setitem__(context, output)
-            return tmpDict
-            
+                    wgl = wrapper.doProcess(bioSimRequest)
+                    teleIODictList.add(wgl)
+#                    firstDict = teleIODictList[0]
+#                    print(firstDict.__getText__())
+            return teleIODictList
         elif isinstance(bioSimRequest, ModelRequest):
             outputs = self.doProcessModelRequest(bioSimRequest)
             return outputs
@@ -272,7 +273,7 @@ def do_job_process(tasks_to_accomplish : Queue, tasks_that_are_done : Queue):
         except Exception as ex:
             tasks_that_are_done.put("Error: " + str(ex))
     return True
-    
+
 
 class UpdaterThread():
     '''

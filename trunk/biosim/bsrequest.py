@@ -11,7 +11,7 @@ from threading import Lock
 from werkzeug.datastructures import ImmutableMultiDict
 
 from biosim.bssettings import Context, ShortNormals, RCP, ClimateModel, ModelType
-from biosim.bsutility import WgoutWrapper
+import biosim.biosimdll.BioSIM_API as BioSIM_API
 
 
 typeGenList = ["des", # desaggregated
@@ -19,8 +19,6 @@ typeGenList = ["des", # desaggregated
                "gribs"] # gribs source
 typeOutputList = ["h", # hourly
                   "d"] # daily (default)
-
-ticketNumber = int(0)
 
 lock = Lock()
 
@@ -235,42 +233,9 @@ class AbstractRequest:
             if self.n > AbstractRequest.nbMaxCoordinatesWG:
                 raise BioSimRequestException("The maximum number of coordinates in a climate generation request is limited to " + str(AbstractRequest.nbMaxCoordinatesWG))
 
-        
-        
-        
-    @staticmethod
-    def registerTeleIOObjects(listForThisPlot, initialDateYr, finalDateYr, nbRep, lastDailyDate):
-        lock.acquire()
-        wgoutWrapper = WgoutWrapper(listForThisPlot, initialDateYr, finalDateYr, nbRep, lastDailyDate)
-        key = hash(wgoutWrapper)
-        AbstractRequest.library.__setitem__(str(key), wgoutWrapper);
-        while len(AbstractRequest.library) > AbstractRequest.maxNumberWgoutInstances:
-            firstkey = next(iter(AbstractRequest.library.keys()))
-            del AbstractRequest.library[firstkey]  ## we remove the oldest instances first these are the first instance in the ordered dict
-        lock.release()
-        return str(key)
-
-    @staticmethod
-    def removeTeleIOObjects(references):
-        lock.acquire()
-        for ref in references:
-            if AbstractRequest.library.__contains__(ref):
-                del AbstractRequest.library[ref]
-        lock.release()
-        
-    @staticmethod
-    def getTeleIOObjects(wgoutHash):
-        lock.acquire()
-        obj = AbstractRequest.library.get(wgoutHash)
-        if obj is not None:
-            AbstractRequest.library.move_to_end(wgoutHash, last = True) ### move the object to the end so that it shows it's been recently used
-        lock.release()
-        return obj;
-    
     @staticmethod
     def parseVariableRequestString(variables):
         variablesStr = ""
-#        variables = ["TN", "TX", "P"]
         for var in variables:
             variablesStr += var + "+"       ### variables are now separated by a + MF20191107
         variablesStr = variablesStr[0:variablesStr.__len__() - 1]
@@ -329,7 +294,6 @@ class SimpleModelRequest(AbstractRequest):
         raise BioSimRequestException("An SimpleModelRequest must at least include model=")
 
     def checkParmsValues(self, d:dict):
-        self.wgoutsList = [];
         errMsg = ""
         modelName = d.get("model")
         try:
@@ -376,17 +340,15 @@ class ModelRequest(SimpleModelRequest):
 
     def checkParmsValues(self, d:dict):
         errMsg = SimpleModelRequest.checkParmsValues(self, d)
-        wgouthash = d.get("wgout")
-        wgouts = wgouthash.split()
-        self.n = len(wgouts)
+        keysToLibrary = d.get("wgout")
+        keys = keysToLibrary.split()
+        self.n = len(keys)
         self.checkIfNBustsMaxCapacity()
-        for wgout in wgouts:
-            teleIOObj = AbstractRequest.getTeleIOObjects(wgout)
-            if teleIOObj is None:
-                errMsg = self.updateErrMsg(errMsg, "The wgout object reference is not found in the library!");
-            else: 
-                self.wgoutsList.append(teleIOObj)
-            
+        teleIODictList = TeleIODictList.getTeleIODictList(keys)
+        if teleIODictList is None:
+            errMsg = self.updateErrMsg(errMsg, "The wgout object reference is not found in the library!");
+        else: 
+            self.teleIODictList = teleIODictList
         return errMsg
     
     
@@ -449,6 +411,9 @@ class WeatherGeneratorRequest(AbstractRequest):
          
         return errMsg
     
+    def getDatesYr(self, context : Context):
+        return self.contextDict.get(context)
+    
     
     def parseRequest(self, i, context : Context):
         requestString = AbstractRequest.parseRequest(self, i, context);
@@ -463,8 +428,10 @@ class WeatherGeneratorRequest(AbstractRequest):
             source = "FromNormals"             
         requestString += "&Source=" + source            
         
-        initDateYr = self.contextDict.get(context)[0]
-        finalDateYr = self.contextDict.get(context)[1]
+        datesYr = self.getDatesYr(context)
+        
+        initDateYr = datesYr[0]
+        finalDateYr = datesYr[1]
 
         if source == "FromObservation":
             requestString += "&First_year=" + str(initDateYr) + "&Last_year=" + str(finalDateYr)
@@ -522,9 +489,235 @@ class WeatherGeneratorRequest(AbstractRequest):
         return self.dict.get("source") == "FromNormals"
         
         
+    
+        
+class BioSimRequestException(Exception):
+    
+    def __init__(self, message : str):
+        Exception.__init__(self, message)
+    
+
+
+class TeleIODictList(list):
+    '''
+    A List of TeleIODict instances. It handles the concatenation of instances from several contexts in order
+    to have a single TeleIODict instance in the end. 
+    '''
+    
+    ticketNumber = int(0)
+    
+    def add(self, l : list):
+        '''
+        Add a TeleIODictList instance to this one. If this instance is empty, the entries of the l argument
+        are simply appended to this list. Otherwise, the TeleIODict instances in l are merged with those of
+        this instance.
+        '''
+        if len(self) > 0 and len(l) != len(self):
+            raise("WeatherGeneratorList.add: the list is not compatible!")
+        elif isinstance(l, TeleIODictList) == False:
+            raise("The l parameter should be of the WeatherGeneratorList class!")
+        else:
+            isEmpty = len(self) == 0
+            for i in range(len(l)):
+                if isEmpty:
+                    self.append(l[i])
+                else:
+                    self[i].__merge__(l[i])
+    
+    def setLastDailyDate(self, date):
+        for obj in self:
+            obj.__setLastDailyDate__(date)
+
+    def registerTeleIODictList(self):
+        '''
+        Register the TeleIODictList instance in the library for the non ephemeral mode
+        '''
+        lock.acquire()
+        outputStr = ""
+        for i in range(len(self)):
+            key = str(TeleIODictList.ticketNumber)
+            AbstractRequest.library.__setitem__(key, self[i]);
+            if i == 0:
+                outputStr += key
+            else:
+                outputStr += " " + key
+            TeleIODictList.ticketNumber += 1
+        while len(AbstractRequest.library) > AbstractRequest.maxNumberWgoutInstances:
+            firstkey = next(iter(AbstractRequest.library.keys()))
+            del AbstractRequest.library[firstkey]  ## we remove the oldest instances first these are the first instance in the ordered dict
+        lock.release()
+        return outputStr
+    
+    def getOutputText(self):
+        '''
+        Parse the text before it is sent to the client
+        '''
+        outputStr = ""
+        for i in range(len(self)):
+            outputStr += self[i].__getText__(True)
+        return outputStr;
+    
+    def getTeleIO(self, i):
+        '''
+        Return a BioBIM_API.teleIO instance corresponding to the ith TeleIODict instance in this list
+        '''
+        return self[i].getTeleIO()
+
+    @staticmethod
+    def removeTeleIODictList(references):
+        lock.acquire()
+        for ref in references:
+            if AbstractRequest.library.__contains__(ref):
+                del AbstractRequest.library[ref]
+        lock.release()
+        
+    @staticmethod
+    def getTeleIODictList(l : list):
+        teleIODictList = TeleIODictList()
+        lock.acquire()
+        for key in l:
+            obj = AbstractRequest.library.get(key)
+            if obj is not None:
+                AbstractRequest.library.move_to_end(key, last = True) ### move the object to the end so that it shows it's been recently used
+                teleIODictList.append(obj)
+        lock.release()
+        return teleIODictList;
+    
+    
+    def parseToJSON(self):
+        mainDict = dict()
+        for i in range(len(self)):
+            mainDict.__setitem__(i, self[i].__parseToJSON__()) 
+        return mainDict
+
+    
+    
+    
+    
+class TeleIODict(dict): 
+    '''
+    A representation of a BioSIM_API.teleIO instance that can be pickled and parsed. It handles the 
+    concatenation of various BioSIM_API.teleIO instances by updating the value corresponding to the
+    "text" key. This is done through the __merge__ function.
+    '''
+    def __init__(self, obj : BioSIM_API.teleIO, dateYr, isWeatherGenerationOutput = True):
+        '''
+            Convert the teleIO instance into a dict instance so that it can be sent back and forth to the sub processes
+        '''
+        dict.__init__(self)   
+        self["comment"] = obj.comment
+        self["compress"] = obj.compress
+        self["data"] = obj.data
+        self["metadata"] = obj.metadata
+        self["msg"] = obj.msg
+        if isWeatherGenerationOutput == False:
+            self["lastDailyDate"] = dateYr
+            self.__parseText__(obj.text, isWeatherGenerationOutput)
+        else:
+            self.__parseText__(obj.text, isWeatherGenerationOutput, dateYr) ## here dateYr is the finalDate of the context
+       
+    def __parseText__(self, text, isWeatherGenerationOutput, dateYr = None):
+        replications = list()
+        stringForThisRep = ""
+        lines = text.split("\n")
+        repId = 0
+        for i in range(len(lines)):
+            if i == 0:
+                self["header"] = lines[i]
+                headerFields = self["header"].split(",")
+                indexYearField = headerFields.index("Year")
+            elif lines[i] == self["header"]:
+                replications.append(stringForThisRep)
+                stringForThisRep = ""
+                repId += 1
+            elif len(lines[i]) > 0:
+                myLine = lines[i]
+                values = myLine.split(",")
+                if isWeatherGenerationOutput == True:
+                    thisYear = int(values[indexYearField])
+                    if thisYear <= 0:
+                        values[indexYearField] = dateYr + thisYear
+                        myLine = self.__parseListToString__(values)
+                else: ## then it is a model output
+                    lastDailyDate = self["lastDailyDate"]
+                    try:
+                        thisYear = int(values[indexYearField])
+                        if thisYear < lastDailyDate:
+                            dataType = "Real_Data"
+                        elif thisYear == lastDailyDate: 
+                            dataType = "Real_Data/Simulated"
+                        else:
+                            dataType = "Simulated"
+                    except Exception:
+                        dataType = "No year provided"
+                    myLine = str(repId) + "," + myLine + "," + dataType
+                stringForThisRep += myLine + "\n"
+        replications.append(stringForThisRep)
+        if isWeatherGenerationOutput == False:
+            currentHeader = self["header"]
+            newHeader = "Rep," + currentHeader + ",DataType"
+            self["header"] = newHeader
+        self["replist"] = replications
+
+    def __parseListToString__(self, myList:list):
+        s = ""
+        for i in range(len(myList)):
+            s += str(myList[i])
+            if i < (len(myList) - 1):
+                s += ","
+        return s
+
+    def __getText__(self, isOutput = False):
+        outputStr = ""
+        rep = self["replist"]  
+        if isOutput == True:        ### then only one header
+            outputStr += self["header"] + "\n"
+        for i in range(len(rep)):
+            if isOutput == False:
+                outputStr += self["header"] + "\n"
+            outputStr += rep[i]
+        return outputStr
+    
+    def __setLastDailyDate__(self, date):
+        self["lastDailyDate"] = date
+        
+    def __parseToJSON__(self):
+        if self["msg"] == "Success":
+            headerFields = self["header"].split(",")
+            mainDict = dict()
+            for i in range(len(self["replist"])):
+                mainDict.__setitem__(i, list())
+                thisRep = self["replist"][i]
+                lines = thisRep.split("\n")
+                for line in lines:
+                    values = line.split(",")
+                    mainDict.get(i).append(dict(zip(headerFields, values)))
+            return mainDict
+        else:
+            return self["msg"]
+
+        
+        
+        
+    def getTeleIO(self):
+        '''
+        Re-convert a TeleIODict instance into a BioSIM_API.teleIO instance
+        '''
+        teleIOobj = BioSIM_API.teleIO(self["compress"], self["msg"], self["comment"], self["metadata"], self.__getText__(), self["data"])
+        return teleIOobj
+
+    def __merge__(self, w):
+        thisRepList = self["replist"]
+        thatRepList = w["replist"]
+        if isinstance(w, TeleIODict) == False or len(thisRepList) != len(thatRepList):
+            raise("The w argument should be a WeatherGeneratorLocation instance with the same number of replications!")
+        for i in range(len(thisRepList)):
+            thisRepList[i] += thatRepList[i]    
+
+            
+
 class WeatherGeneratorEpheremalRequest(WeatherGeneratorRequest, SimpleModelRequest):
-    
-    
+   
     def __init__(self, d : ImmutableMultiDict):
         WeatherGeneratorRequest.__init__(self, d)
         self.weatherGenerated = False
@@ -547,13 +740,5 @@ class WeatherGeneratorEpheremalRequest(WeatherGeneratorRequest, SimpleModelReque
     def setVariables(self, variables):
         self.var = variables
         
-    def storeWgoutWrapper(self, wgoutwrapper : WgoutWrapper): 
-        self.wgoutsList.append(wgoutwrapper)   
-    
-        
-class BioSimRequestException(Exception):
-    
-    def __init__(self, message : str):
-        Exception.__init__(self, message)
-    
-    
+    def storeTeleIODictList(self, w : TeleIODictList): 
+        self.teleIODictList = w 
