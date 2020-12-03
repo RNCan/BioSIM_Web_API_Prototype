@@ -148,7 +148,8 @@ class ModelType(Enum):
             return nb
     
     def isMultiProcessEnabled(self):
-        return self.getNbProcesses() > 1
+#        return self.getNbProcesses() > 1
+        return True
     
     def getName(self):
         return self.value[0]
@@ -361,6 +362,7 @@ class Context:
     
     def isMultiProcessEnabled(self):
         return self.getNbProcesses() > 1
+#        return True
     
     def getInitializationString(self):
         initializationString = self.shore.getCommand() + "&" + self.normals.getCommand() + "&" + self.dem.getCommand() + "&" + self.gribs.getCommand()
