@@ -202,8 +202,6 @@ class Server:
                 if (bioSimRequest.doesThisContextMatch(context)):
                     wgl = wrapper.doProcess(bioSimRequest)
                     teleIODictList.add(wgl)
-#                    firstDict = teleIODictList[0]
-#                    print(firstDict.__getText__())
             return teleIODictList
         elif isinstance(bioSimRequest, ModelRequest):
             outputs = self.doProcessModelRequest(bioSimRequest)

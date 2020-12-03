@@ -7,8 +7,8 @@ Handle the different model types and the instantiation of models in BioSIM.
 from multiprocessing import Queue, Process, Lock
 
 from biosim.bssettings import ModelType, Settings
-from biosim.bsrequest import ModelRequest, TeleIODict, TeleIODictList
-from biosim.bsutility import WgoutWrapper, BioSimUtility
+from biosim.bsrequest import ModelRequest
+from biosim.bsutility import WgoutWrapper, BioSimUtility, TeleIODict, TeleIODictList
 import biosim.biosimdll.BioSIM_API as BioSIM_API
 
 

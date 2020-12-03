@@ -10,8 +10,9 @@ from multiprocessing import Process, Queue
 from threading import Lock
 
 from biosim.bssettings import Context, Settings
-from biosim.bsrequest import NormalsRequest, AbstractRequest, WeatherGeneratorRequest, TeleIODictList, TeleIODict
-from biosim.bsutility import BioSimUtility 
+from biosim.bsrequest import NormalsRequest, AbstractRequest, WeatherGeneratorRequest 
+from biosim.bsutility import BioSimUtility, TeleIODictList, TeleIODict
+ 
 import biosim.biosimdll.BioSIM_API as BioSIM_API
 
 
