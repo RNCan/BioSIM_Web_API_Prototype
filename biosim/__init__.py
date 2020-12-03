@@ -4,7 +4,7 @@ Entry point of the biosim module.
 @author: M. Fortin and R. Saint-Amant, Canadian Forest Service, August 2020
 @copyright: Her Majesty the Queen in right of Canada
 '''
-from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelRequest , AbstractRequest, \
+from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelRequest ,  \
     WeatherGeneratorEpheremalRequest, BioSimRequestException, \
     SimpleModelRequest, TeleIODictList
 from biosim.bsserver import Server
@@ -28,7 +28,7 @@ def create_app(test_config=None):
     @app.route('/BioSimMemoryLoad')
     def biosimMemoryLoad():
         try:
-            nbWgouts = len(AbstractRequest.library)
+            nbWgouts = len(BioSimUtility.library)
             return str(nbWgouts)
         except Exception as error:
             return make_response(str(error), 500)
@@ -37,7 +37,7 @@ def create_app(test_config=None):
     @app.route('/BioSimMaxMemory')
     def biosimMaxMemory():
         try:
-            return str(AbstractRequest.maxNumberWgoutInstances)
+            return str(BioSimUtility.maxNumberWgoutInstances)
         except Exception as error:
             return make_response(str(error), 500)
     
@@ -46,12 +46,16 @@ def create_app(test_config=None):
     def biosimMemoryCleanUp():
         parms = request.args
         try:
-            references = parms.get("ref").split()
-            TeleIODictList.removeTeleIODictList(references)
-            return "Done"
+            if parms.__contains__("ref"):
+                references = parms.get("ref").split()
+                TeleIODictList.removeTeleIODictList(references)
+                return "Done"
+            else:
+                raise BioSimRequestException("A request for a memory cleanup must contain a ref argument!")
         except Exception as error:
+            if isinstance(error, BioSimRequestException):
+                return make_response(str(error), 400)
             return make_response(str(error), 500)
-        ### TODO better error handling here
 
     
     @app.route('/BioSimModelEphemeral')
@@ -142,9 +146,9 @@ def create_app(test_config=None):
         parms = request.args
         try:
             if parms.get("format", "CSV") == "JSON":
-                return jsonify(maxWeatherGeneration = AbstractRequest.nbMaxCoordinatesWG, maxNormals = AbstractRequest.nbMaxCoordinatesNormals)
+                return jsonify(maxWeatherGeneration = Settings.nbMaxCoordinatesWG, maxNormals = Settings.nbMaxCoordinatesNormals)
             else: 
-                return str(AbstractRequest.nbMaxCoordinatesWG) + FieldSeparator + str(AbstractRequest.nbMaxCoordinatesNormals)
+                return str(Settings.nbMaxCoordinatesWG) + FieldSeparator + str(Settings.nbMaxCoordinatesNormals)
         except Exception as error:
             return make_response(str(error), 500)
     
@@ -185,7 +189,7 @@ def create_app(test_config=None):
 
     
     @app.route('/BioSimNormals')
-    def biosimNormals():
+    def biosimNormals():            #### TODO the function needs to be refactored MF20201203
         parms = request.args
         try:
             bioSimRequest = NormalsRequest(parms)

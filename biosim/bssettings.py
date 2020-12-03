@@ -17,6 +17,8 @@ class Settings():
     SimpleMode = False   ### true: without multiprocessing false: with multiprocessing   
     Verbose = True
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
+    nbMaxCoordinatesNormals = 50
+    nbMaxCoordinatesWG = 10
 
 
 class CurrentDaily(Enum):
