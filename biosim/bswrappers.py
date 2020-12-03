@@ -73,10 +73,6 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
             self.tasksToDo = Queue()
             self.tasksDone = Queue()
             self.processes = self.initializeProcesses(context, self.tasksToDo, self.tasksDone)
-#             for i in range(context.getNbProcesses()):  
-#                 p = Process(target=do_job, args = (context, self.tasksToDo, self.tasksDone))
-#                 self.processes.append(p)
-#                 p.start()
         else:
             self.WG = BioSIM_API.WeatherGenerator(context.getContextName())
             initializationString = context.getInitializationString()

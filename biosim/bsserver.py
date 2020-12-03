@@ -34,10 +34,13 @@ class Server:
         '''
         Constructor
         '''
-        if Settings.SimpleMode == True:
-            self.nbProcessesForWrappers = 1
+        if Settings.MultiprocessMode:
+            if Settings.ProductionMode:
+                self.nbProcessesForWrappers = 3
+            else: # then multiprocess but development mode 
+                self.nbProcessesForWrappers = 2
         else: 
-            self.nbProcessesForWrappers = 3
+            self.nbProcessesForWrappers = 1
             
         print("Loading contexts and models...")    
         pastClimateNormals = [Normals.CanUSA1941_1970, Normals.CanUSA1951_1980, Normals.CanUSA1961_1990, Normals.CanUSA1971_2000, Normals.CanUSA1981_2010]
@@ -161,7 +164,7 @@ class Server:
             model = Model(modType)
             self.models.__setitem__(modType, model)
         
-        if Settings.SimpleMode == False:    
+        if Settings.ProductionMode:    
             print("Initiating updater thread...")
             UpdaterThread(self)
         print("Server initialized!")

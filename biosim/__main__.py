@@ -1,16 +1,17 @@
 '''
-Entry point of the biosim module to be run as main. 
+Entry point of the biosim module. 
 
 @author: M. Fortin and R. Saint-Amant, Canadian Forest Service, August 2020
 @copyright: Her Majesty the Queen in right of Canada
 '''
-from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelRequest , AbstractRequest, \
+from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelRequest ,  \
     WeatherGeneratorEpheremalRequest, BioSimRequestException, \
-    SimpleModelRequest
+    SimpleModelRequest, TeleIODictList
 from biosim.bsserver import Server
 from biosim.bssettings import Settings
-from biosim.bsutility import WgoutWrapper, BioSimUtility
+from biosim.bsutility import BioSimUtility
 from flask import Flask 
+import flask
 from flask.globals import request
 from flask.helpers import make_response
 from flask.json import jsonify
@@ -27,7 +28,7 @@ def create_app(test_config=None):
     @app.route('/BioSimMemoryLoad')
     def biosimMemoryLoad():
         try:
-            nbWgouts = len(AbstractRequest.library)
+            nbWgouts = len(BioSimUtility.library)
             return str(nbWgouts)
         except Exception as error:
             return make_response(str(error), 500)
@@ -36,7 +37,7 @@ def create_app(test_config=None):
     @app.route('/BioSimMaxMemory')
     def biosimMaxMemory():
         try:
-            return str(AbstractRequest.maxNumberWgoutInstances)
+            return str(BioSimUtility.maxNumberWgoutInstances)
         except Exception as error:
             return make_response(str(error), 500)
     
@@ -45,12 +46,16 @@ def create_app(test_config=None):
     def biosimMemoryCleanUp():
         parms = request.args
         try:
-            references = parms.get("ref").split()
-            AbstractRequest.removeTeleIODictList(references)
-            return "Done"
+            if parms.__contains__("ref"):
+                references = parms.get("ref").split()
+                TeleIODictList.removeTeleIODictList(references)
+                return "Done"
+            else:
+                raise BioSimRequestException("A request for a memory cleanup must contain a ref argument!")
         except Exception as error:
+            if isinstance(error, BioSimRequestException):
+                return make_response(str(error), 400)
             return make_response(str(error), 500)
-        ### TODO better error handling here
 
     
     @app.route('/BioSimModelEphemeral')
@@ -58,33 +63,15 @@ def create_app(test_config=None):
         parms = request.args
         try:
             bioSimRequest = WeatherGeneratorEpheremalRequest(parms)
-            outputs = server.processRequest(bioSimRequest)
-            if bioSimRequest.isForceClimateGenerationEnabled():
-                lastDailyDate = -999                            # means climate is generated even for past dates
-            else:
-                lastDailyDate = server.lastDailyDate            # means we are using observation
-            strOutput = ""
-            for i in range(bioSimRequest.n):
-                listForThisPlot = []
-                for context in outputs.keys():
-                    wgout = outputs.get(context)[i]
-                    listForThisPlot.append(wgout)
-                wgoutWrapper = WgoutWrapper(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate)
-                bioSimRequest.storeWgoutWrapper(wgoutWrapper)
+            teleIODictList = doWeatherGeneration(bioSimRequest)
+            bioSimRequest.storeTeleIODictList(teleIODictList)
                 
             bioSimRequest.weatherGenerated = True
-            outputsList = server.doProcessModelRequest(bioSimRequest)
+            modelResultTeleIODictList = server.doProcessModelRequest(bioSimRequest)
             if bioSimRequest.isJSONFormatRequested():
-                mainDict = dict()
-                for i in range(bioSimRequest.n):
-                    modelOutputWrapper = outputsList[i] 
-                    mainDict.__setitem__(i, modelOutputWrapper.parseOutputToDict())
-                return jsonify(mainDict)
+                return jsonify(modelResultTeleIODictList.parseToJSON())
             else:
-                strOutput = ""
-                for modelOutputWrapper in outputsList: 
-                    strOutput += modelOutputWrapper.parseOutputToString()
-                return strOutput 
+                return modelResultTeleIODictList.getOutputText()
         except Exception as error:
             if isinstance(error, BioSimRequestException):
                 return make_response(str(error), 400)
@@ -96,25 +83,26 @@ def create_app(test_config=None):
         return biosimModelEphemeral()
 
     
+    def doWeatherGeneration(bioSimRequest : WeatherGeneratorRequest):
+        '''
+        Perform the weather generation and returns a TeleIODictList instance
+        '''
+        outputs = server.processRequest(bioSimRequest)
+        if bioSimRequest.isForceClimateGenerationEnabled():
+            outputs.setLastDailyDate(-999)      # means climate is generated even for past dates
+        else:
+            outputs.setLastDailyDate(server.lastDailyDate)     # means we are using observation
+        return outputs
+    
+    
     @app.route('/BioSimWG')
     def biosimWG():
         parms = request.args
         try:
             bioSimRequest = WeatherGeneratorRequest(parms)
-            outputs = server.processRequest(bioSimRequest)
-            if bioSimRequest.isForceClimateGenerationEnabled():
-                lastDailyDate = -999                            # means climate is generated even for past dates
-            else:
-                lastDailyDate = server.lastDailyDate            # means we are using observation
-            strOutput = ""
-            for i in range(bioSimRequest.n):
-                listForThisPlot = []
-                for context in outputs.keys():
-                    wgout = outputs.get(context)[i]
-                    listForThisPlot.append(wgout)
-                
-                strOutput += AbstractRequest.registerTeleIODictList(listForThisPlot, bioSimRequest.getInitialDateYr(), bioSimRequest.getFinalDateYr(), bioSimRequest.getNbRep(), lastDailyDate) + " "
-            return strOutput
+            teleIODictList = doWeatherGeneration(bioSimRequest)
+            keysToLibrary = teleIODictList.registerTeleIODictList()
+            return keysToLibrary
         
         except Exception as error:
             if isinstance(error, BioSimRequestException):
@@ -158,9 +146,9 @@ def create_app(test_config=None):
         parms = request.args
         try:
             if parms.get("format", "CSV") == "JSON":
-                return jsonify(maxWeatherGeneration = AbstractRequest.nbMaxCoordinatesWG, maxNormals = AbstractRequest.nbMaxCoordinatesNormals)
+                return jsonify(maxWeatherGeneration = Settings.nbMaxCoordinatesWG, maxNormals = Settings.nbMaxCoordinatesNormals)
             else: 
-                return str(AbstractRequest.nbMaxCoordinatesWG) + FieldSeparator + str(AbstractRequest.nbMaxCoordinatesNormals)
+                return str(Settings.nbMaxCoordinatesWG) + FieldSeparator + str(Settings.nbMaxCoordinatesNormals)
         except Exception as error:
             return make_response(str(error), 500)
     
@@ -170,18 +158,11 @@ def create_app(test_config=None):
         parms = request.args
         try:
             bioSimRequest = ModelRequest(parms)
-            outputsList = server.processRequest(bioSimRequest)
+            modelResultTeleIODictList = server.processRequest(bioSimRequest)
             if bioSimRequest.isJSONFormatRequested():
-                mainDict = dict()
-                for i in range(bioSimRequest.n):
-                    modelOutputWrapper = outputsList[i] 
-                    mainDict.__setitem__(i, modelOutputWrapper.parseOutputToDict())
-                return jsonify(mainDict)
+                return jsonify(modelResultTeleIODictList.parseToJSON())
             else:
-                strOutput = ""
-                for modelOutputWrapper in outputsList: 
-                    strOutput += modelOutputWrapper.parseOutputToString()
-                return strOutput 
+                return modelResultTeleIODictList.getOutputText()
         except Exception as error:
             if isinstance(error, BioSimRequestException):
                 return make_response(str(error), 400)
@@ -208,7 +189,7 @@ def create_app(test_config=None):
 
     
     @app.route('/BioSimNormals')
-    def biosimNormals():
+    def biosimNormals():            #### TODO the function needs to be refactored MF20201203
         parms = request.args
         try:
             bioSimRequest = NormalsRequest(parms)
@@ -239,14 +220,16 @@ def create_app(test_config=None):
 
 
 if __name__ == "__main__":
-    Settings.SimpleMode = False   ### enabling multiprocessing
+    Settings.ProductionMode = True   
+    Settings.MultiprocessMode = True
     print("Name set to " + str(__name__))
-    print("Enabling multiprocessing")
+    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
     app = create_app()        
-    server = Server()                               ### if running in simple mode then there is no multiprocessing
+    server = Server()                               
     serve(TransLogger(create_app(), setup_console_handler=True), listen='0.0.0.0:5000', ident="biosim")
 elif __name__ == "__biosim__":
-    Settings.SimpleMode = True
+    Settings.ProductionMode = False   
+    Settings.MultiprocessMode = False
     print("Name set to " + str(__name__))
-    print("Disabling multiprocessing")
+    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
     server = Server()        

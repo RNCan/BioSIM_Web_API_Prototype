@@ -14,8 +14,10 @@ import os
 
 class Settings():
     
-    SimpleMode = False   ### true: without multiprocessing false: with multiprocessing   
+#    SimpleMode = False   ### true: without multiprocessing false: with multiprocessing   
     Verbose = True
+    ProductionMode = True
+    MultiprocessMode = True
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
     nbMaxCoordinatesNormals = 50
     nbMaxCoordinatesWG = 10
@@ -93,7 +95,7 @@ class ModelType(Enum):
 #    Insect_Development_Database_III = "Insect Development Database III.mdl"   ### Always causes an exception
     Jackpine_Budworm = ["Jackpine Budworm.mdl", 9]
     LaricobiusNigrinus = ["LaricobiusNigrinus.mdl", 5]
-#    MPB_Cold_Tolerance_Annual = ["MPB Cold Tolerance (Annual).mdl", 5]       ### ArrayIndexOutOfBoundsException
+    MPB_Cold_Tolerance_Annual = ["MPB Cold Tolerance (Annual).mdl", 5]       ### ArrayIndexOutOfBoundsException
     MPB_Cold_Tolerance_Daily = ["MPB Cold Tolerance (Daily).mdl", 5]
     MPB_SLR = ["MPB-SLR.mdl", 7]
     ObliqueBandedLeafroller = ["ObliqueBandedLeafroller.mdl", 5]
@@ -121,7 +123,7 @@ class ModelType(Enum):
     Spruce_Budworm_Biology = ["Spruce Budworm Biology.mdl", 9]
 #    Spruce_Budworm_Dispersal = "Spruce Budworm Dispersal.mdl"                ### encoding causes an exception between Python and C++
     Spruce_Budworm_Manitoba = ["Spruce Budworm Manitoba.mdl", 3]
-#    SpruceBeetle = ["SpruceBeetle.mdl", 3]                                ### ArrayIndexOutOfBoundsException
+    SpruceBeetle = ["SpruceBeetle.mdl", 3]                                ### ArrayIndexOutOfBoundsException
     Standardised_Precipitation_Evapotranspiration_Index = ["Standardised Precipitation Evapotranspiration Index.mdl", 7]
     TminTairTmax_Daily = ["TminTairTmax (Daily).mdl", 5]
     Tranosema_OBL_SBW_daily = ["Tranosema-OBL-SBW (daily).mdl", 5]
@@ -139,17 +141,22 @@ class ModelType(Enum):
         return Settings.ROOT_DIR + "models" + path.sep + self.value[0]
 
     def getNbProcesses(self):
-        if Settings.SimpleMode == True:
-            return 1
-        else:
+        if Settings.MultiprocessMode:
             nb = floor(self.value[1] / 2) 
             if nb == 0:
                 nb = 1
-            return nb
+            if Settings.ProductionMode:  ### then use the maximum number of processes
+                return nb
+            else:       ### in development mode, then limit the maximum number of processes to 2
+                if nb > 2:
+                    return 2
+                else:
+                    return nb
+        else:
+            return 1
     
     def isMultiProcessEnabled(self):
-#        return self.getNbProcesses() > 1
-        return True
+        return self.getNbProcesses() > 1
     
     def getName(self):
         return self.value[0]
@@ -362,7 +369,6 @@ class Context:
     
     def isMultiProcessEnabled(self):
         return self.getNbProcesses() > 1
-#        return True
     
     def getInitializationString(self):
         initializationString = self.shore.getCommand() + "&" + self.normals.getCommand() + "&" + self.dem.getCommand() + "&" + self.gribs.getCommand()
