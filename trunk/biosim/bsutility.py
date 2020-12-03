@@ -167,11 +167,12 @@ class TeleIODict(dict):
             self["data"] = obj.data
             self["metadata"] = obj.metadata
             self["msg"] = obj.msg
-            if isWeatherGenerationOutput == False:
-                self["lastDailyDate"] = dateYr
-                self.__parseText__(obj.text, isWeatherGenerationOutput)
-            else:
-                self.__parseText__(obj.text, isWeatherGenerationOutput, dateYr) ## here dateYr is the finalDate of the context
+            if obj.msg == "Success":
+                if isWeatherGenerationOutput == False:
+                    self["lastDailyDate"] = dateYr
+                    self.__parseText__(obj.text, isWeatherGenerationOutput)
+                else:
+                    self.__parseText__(obj.text, isWeatherGenerationOutput, dateYr) ## here dateYr is the finalDate of the context
 
        
     def __parseText__(self, text, isWeatherGenerationOutput, dateYr = None):
@@ -226,21 +227,24 @@ class TeleIODict(dict):
         return s
 
     def __getText__(self, isOutput = False):
-        outputStr = ""
-        rep = self["replist"]  
-        if isOutput == True:        ### then only one header
-            outputStr += self["header"] + "\n"
-        for i in range(len(rep)):
-            if isOutput == False:
+        if self.isValid():
+            outputStr = ""
+            rep = self["replist"]  
+            if isOutput == True:        ### then only one header
                 outputStr += self["header"] + "\n"
-            outputStr += rep[i]
-        return outputStr
-    
+            for i in range(len(rep)):
+                if isOutput == False:
+                    outputStr += self["header"] + "\n"
+                outputStr += rep[i]
+            return outputStr
+        else:
+            return self["msg"]
+
     def __setLastDailyDate__(self, date):
         self["lastDailyDate"] = date
         
     def __parseToJSON__(self):
-        if self["msg"] == "Success":
+        if self.isValid():
             headerFields = self["header"].split(",")
             mainDict = dict()
             for i in range(len(self["replist"])):
@@ -261,13 +265,20 @@ class TeleIODict(dict):
         teleIOobj = BioSIM_API.teleIO(self["compress"], self["msg"], self["comment"], self["metadata"], self.__getText__(), self["data"])
         return teleIOobj
 
+    def isValid(self):
+        return "Success" == self["msg"]
+
     def __merge__(self, w):
-        thisRepList = self["replist"]
-        thatRepList = w["replist"]
-        if isinstance(w, TeleIODict) == False or len(thisRepList) != len(thatRepList):
-            raise("The w argument should be a WeatherGeneratorLocation instance with the same number of replications!")
-        for i in range(len(thisRepList)):
-            thisRepList[i] += thatRepList[i]    
+        if self.isValid():  ### if the current msg is not Success we don't do anything
+            if w.isValid(): ### if both msgs are equal to Success then merge
+                thisRepList = self["replist"]
+                thatRepList = w["replist"]
+                if isinstance(w, TeleIODict) == False or len(thisRepList) != len(thatRepList):
+                    raise("The w argument should be a WeatherGeneratorLocation instance with the same number of replications!")
+                for i in range(len(thisRepList)):
+                    thisRepList[i] += thatRepList[i]    
+            else:
+                self["msg"] = w["msg"]      # update the current TeleIODict instance with the new message of failure
 
     def clone(self):
         teleIODict = TeleIODict(None, None, False)  ### to get an empty instance
@@ -275,38 +286,3 @@ class TeleIODict(dict):
             teleIODict.__setitem__(k, self[k])
         return teleIODict
     
-class WgoutWrapper:
-    
-    def __init__(self, obj, initDateYr, finalDateYr, nbRep, lastDailyDate):
-        '''
-        Constructor
-        '''
-        self.obj = obj
-        self.initDateYr = initDateYr
-        self.finalDateYr = finalDateYr
-        self.nbRep = nbRep
-        self.lastDailyDate = lastDailyDate
-
-    def getInitialDateYr(self):
-        return self.initDateYr
-    
-    def getFinalDateYr(self):
-        return self.finalDateYr
-    
-    def getWgouts(self):
-        return self.obj
-
-    def getNbRep(self):
-        return self.nbRep
-    
-    def convertIntoDict(self):
-        d = dict()
-        wgouts = []
-        for wgout in self.obj:
-            wgouts.append(BioSimUtility.convertTeleIOToDict(wgout))
-        d["wgouts"] = wgouts
-        d["initDateYr"] = self.initDateYr
-        d["finalDateYr"] = self.finalDateYr
-        d["nbRep"] = self.nbRep      
-        d["lastDailyDate"] = self.lastDailyDate
-        return d

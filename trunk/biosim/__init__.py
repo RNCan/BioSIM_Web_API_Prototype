@@ -9,7 +9,7 @@ from biosim.bsrequest import WeatherGeneratorRequest, NormalsRequest, ModelReque
     SimpleModelRequest, TeleIODictList
 from biosim.bsserver import Server
 from biosim.bssettings import Settings
-from biosim.bsutility import WgoutWrapper, BioSimUtility
+from biosim.bsutility import BioSimUtility
 from flask import Flask 
 import flask
 from flask.globals import request
@@ -220,14 +220,16 @@ def create_app(test_config=None):
 
 
 if __name__ == "__main__":
-    Settings.SimpleMode = True   ### disabling multiprocessing
+    Settings.ProductionMode = False   
+    Settings.MultiprocessMode = True
     print("Name set to " + str(__name__))
-    print("Disabling multiprocessing")
+    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
     app = create_app()        
-    server = Server()                               ### if running in simple mode then there is no multiprocessing
+    server = Server()                               
     serve(TransLogger(create_app(), setup_console_handler=True), listen='0.0.0.0:5001', ident="biosim")
 elif __name__ == "__biosim__":
-    Settings.SimpleMode = True
+    Settings.ProductionMode = False   
+    Settings.MultiprocessMode = False
     print("Name set to " + str(__name__))
-    print("Disabling multiprocessing")
+    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
     server = Server()        
