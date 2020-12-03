@@ -118,11 +118,6 @@ class TeleIODictList(list):
             outputStr += self[i].__getText__(True)
         return outputStr;
     
-    def getTeleIO(self, i):
-        '''
-        Return a BioBIM_API.teleIO instance corresponding to the ith TeleIODict instance in this list
-        '''
-        return self[i].getTeleIO()
 
     @staticmethod
     def removeTeleIODictList(references):
@@ -165,17 +160,19 @@ class TeleIODict(dict):
         '''
             Convert the teleIO instance into a dict instance so that it can be sent back and forth to the sub processes
         '''
-        dict.__init__(self)   
-        self["comment"] = obj.comment
-        self["compress"] = obj.compress
-        self["data"] = obj.data
-        self["metadata"] = obj.metadata
-        self["msg"] = obj.msg
-        if isWeatherGenerationOutput == False:
-            self["lastDailyDate"] = dateYr
-            self.__parseText__(obj.text, isWeatherGenerationOutput)
-        else:
-            self.__parseText__(obj.text, isWeatherGenerationOutput, dateYr) ## here dateYr is the finalDate of the context
+        dict.__init__(self)
+        if obj is not None:   
+            self["comment"] = obj.comment
+            self["compress"] = obj.compress
+            self["data"] = obj.data
+            self["metadata"] = obj.metadata
+            self["msg"] = obj.msg
+            if isWeatherGenerationOutput == False:
+                self["lastDailyDate"] = dateYr
+                self.__parseText__(obj.text, isWeatherGenerationOutput)
+            else:
+                self.__parseText__(obj.text, isWeatherGenerationOutput, dateYr) ## here dateYr is the finalDate of the context
+
        
     def __parseText__(self, text, isWeatherGenerationOutput, dateYr = None):
         replications = list()
@@ -272,6 +269,11 @@ class TeleIODict(dict):
         for i in range(len(thisRepList)):
             thisRepList[i] += thatRepList[i]    
 
+    def clone(self):
+        teleIODict = TeleIODict(None, None, False)  ### to get an empty instance
+        for k in self.keys():
+            teleIODict.__setitem__(k, self[k])
+        return teleIODict
     
 class WgoutWrapper:
     

@@ -41,21 +41,16 @@ def do_job(jobId, modelType : ModelType, tasks_to_accomplish : Queue, tasks_that
     
     while True:
         try:
-            task = tasks_to_accomplish.get()
-            parms = task["parms"]
-            wgouts = task["wgouts"]
-            outputForThisPlot = []
-            for wgout in wgouts:
-                teleIOInput = BioSimUtility.convertDictToTeleIO(wgout)
-                teleIOOutput = innerModel.Execute(parms, teleIOInput)
-                outputForThisPlot.append(BioSimUtility.convertTeleIOToDict(teleIOOutput)) 
-            del task["wgouts"]
-            del task["parms"]
-            task["outputForThisPlot"] = outputForThisPlot
-            tasks_that_are_done.put(task)
-        except:
-            break;
-    return True
+            inputTeleIODict = tasks_to_accomplish.get()
+            parms = inputTeleIODict["parms"]
+            lastDailyDate = inputTeleIODict["lastDailyDate"]
+            inputTeleIO = inputTeleIODict.getTeleIO()
+            outputTeleIO = innerModel.Execute(parms, inputTeleIO)
+            outputTeleIODict = TeleIODict(outputTeleIO, lastDailyDate, False)
+            outputTeleIODict["natOrd"] = inputTeleIODict["natOrd"]
+            tasks_that_are_done.put(outputTeleIODict)
+        except Exception as error:
+            tasks_that_are_done(error)
 
 
 
@@ -107,28 +102,27 @@ class Model():
             mainDict = dict()
             self.lock.acquire()     ### To avoid concurrent feeding of the taskToDo queue
             for i in range(nbLocations):
-                wgoutWrapper = bioSimRequest.wgoutsList[i]
-                task = wgoutWrapper.convertIntoDict()
-                task["natOrd"] = i
-                task["parms"] = bioSimRequest.parseRequest(0, None)
-                self.tasksToDo.put(task)
+                teleIODict = inputTeleIODictList[i].clone()
+                teleIODict["natOrd"] = i
+                teleIODict["parms"] = bioSimRequest.parseRequest(0, None)
+                self.tasksToDo.put(teleIODict)
             for i in range(nbLocations):
-                modelOutput = self.tasksDone.get()
-                naturalOrder = modelOutput["natOrd"]
-                mainDict[naturalOrder] = modelOutput
+                teleIODict = self.tasksDone.get()
+                naturalOrder = teleIODict["natOrd"]
+                del teleIODict["natOrd"]
+                mainDict[naturalOrder] = teleIODict
             self.lock.release()      ### release the lock for other threads
             for i in range(nbLocations):
-                modelOutput = mainDict[i]
-                mow = ModelOutputWrapper()
-                mow.__reconvertFromDict__(modelOutput, bioSimRequest)
-                outputTeleIODictList.append(mow)
+                outputTeleIODictList.append(mainDict[i])
         else:
             for i in range(nbLocations):
                 parms = bioSimRequest.parseRequest(0, None)
-                lastDailyDate = inputTeleIODictList[i]["lastDailyDate"]
-                wgout = inputTeleIODictList.getTeleIO(i)
-                teleIOOutput = self.innerModel.Execute(parms, wgout)
-                outputTeleIODictList.append(TeleIODict(teleIOOutput, lastDailyDate, False))
+                inputTeleIODict = inputTeleIODictList[i]
+                lastDailyDate = inputTeleIODict["lastDailyDate"]
+                inputTeleIO = inputTeleIODict.getTeleIO()
+                outputTeleIO = self.innerModel.Execute(parms, inputTeleIO)
+                outputTeleIODict = TeleIODict(outputTeleIO, lastDailyDate, False)
+                outputTeleIODictList.append(outputTeleIODict)
         return outputTeleIODictList
 
     def getRequiredVariables(self):

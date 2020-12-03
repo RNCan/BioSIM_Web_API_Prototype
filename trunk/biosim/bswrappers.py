@@ -11,7 +11,7 @@ from threading import Lock
 
 from biosim.bssettings import Context, Settings
 from biosim.bsrequest import NormalsRequest, AbstractRequest, WeatherGeneratorRequest 
-from biosim.bsutility import BioSimUtility, TeleIODictList, TeleIODict
+from biosim.bsutility import TeleIODictList, TeleIODict
  
 import biosim.biosimdll.BioSIM_API as BioSIM_API
 
@@ -45,10 +45,11 @@ def do_job(context : Context, tasks_to_accomplish : Queue, tasks_that_are_done :
             task = tasks_to_accomplish.get()
             naturalOrder = task["natOrd"]
             request = task["request"]
+            finalDateYr = task["finalDateYr"]
             outputTeleIOobj = WG.Generate(request)
-            teleIOinDict = BioSimUtility.convertTeleIOToDict(outputTeleIOobj)   ### conversion in a dict instance to avoid pickled exception
-            teleIOinDict["natOrd"] = naturalOrder   ### adding the natural order to sort the instances upon reception in the main process
-            tasks_that_are_done.put(teleIOinDict)
+            teleIODict = TeleIODict(outputTeleIOobj, finalDateYr)   ### conversion in a dict instance to avoid pickled exception
+            teleIODict["natOrd"] = naturalOrder   ### adding the natural order to sort the instances upon reception in the main process
+            tasks_that_are_done.put(teleIODict)
         except:
             break;
     return True
@@ -154,14 +155,16 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
                     d = dict()
                     d["natOrd"] = i
                     d["request"] = bioSimRequest.parseRequest(i, self.context)
+                    d["finalDateYr"] = bioSimRequest.getDatesYr(self.context)[1]
                     self.tasksToDo.put(d)
                 for i in range(bioSimRequest.n):
-                    teleIOinDict = self.tasksDone.get()
-                    naturalOrder = teleIOinDict["natOrd"]
-                    mainDict[naturalOrder] = BioSimUtility.convertDictToTeleIO(teleIOinDict)
+                    teleIODict = self.tasksDone.get()
+                    naturalOrder = teleIODict["natOrd"]
+                    del teleIODict["natOrd"]
+                    mainDict[naturalOrder] = teleIODict
                 self.lock.release()      ### release the lock for other threads
                 for i in range(bioSimRequest.n):
-                    teleIODictList.append(mainDict[i])  ### TODO this does not work any mode
+                    teleIODictList.append(mainDict[i])  
             else:
                 for i in range(bioSimRequest.n):
                     WGout = self.WG.Generate(bioSimRequest.parseRequest(i, self.context))
