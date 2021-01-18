@@ -306,17 +306,17 @@ class Normals(Enum):
     
     
 class Daily(Enum):
-    CanUSA2019_2020 = ["Canada-USA 2019-2020.DailyDB", 2019, 2020]
-    CanUSA1980_2019 = ["Canada-USA 1980-2019.DailyDB", 1980, 2018]
+    CanUSA2020_2021 = ["Canada-USA 2020-2021.DailyDB", 2020, 2021]
+    CanUSA1980_2020 = ["Canada-USA 1980-2020.DailyDB", 1980, 2019]
     CanUSA1950_1980 = ["Canada-USA 1950-1980.DailyDB", 1950, 1979]
     CanUSA1900_1950 = ["Canada-USA 1900-1950.DailyDB", 1900, 1949]
 
     def getPath(self):
-        if (self == Daily.CanUSA2019_2020):
-            dailyStr = CurrentDailyHandler.currentDaily.value
+        if (self == Daily.CanUSA2020_2021):
+            dailyFolderName = CurrentDailyHandler.currentDaily.value  ### this variable set the path to either the DailyLatest or the DailyLatestAlt directory
         else:
-            dailyStr = "Daily" 
-        return Settings.ROOT_DIR + "data" + path.sep + "Weather" + path.sep + dailyStr + path.sep + self.value[0]
+            dailyFolderName = "Daily" 
+        return Settings.ROOT_DIR + "data" + path.sep + "Weather" + path.sep + dailyFolderName + path.sep + self.value[0]
 
     def getCommand(self):
         return "Daily=" + self.getPath()
