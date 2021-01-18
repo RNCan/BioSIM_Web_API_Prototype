@@ -29,6 +29,13 @@ class Server:
     '''
 
     lastDailyDate = 0
+
+    Instance = None
+
+    @staticmethod
+    def InstantiateServer():
+        Server.Instance = Server()
+
     
     def __init__(self):
         '''
