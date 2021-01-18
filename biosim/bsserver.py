@@ -28,9 +28,9 @@ class Server:
     as well as the requests sent to them.
     '''
 
-    lastDailyDate = 0
+    lastDailyDate = 0       ### the variable is set dynamically when loading the context
 
-    Instance = None
+    Instance = None         ### Singleton instance of the server
 
     @staticmethod
     def InstantiateServer():
@@ -120,8 +120,8 @@ class Server:
  
         context1  = Context(Shore.Shore1, Normals.CanUSA1941_1970, Daily.CanUSA1900_1950, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
         context2  = Context(Shore.Shore1, Normals.CanUSA1951_1980, Daily.CanUSA1950_1980, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
-        context3  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA1980_2019, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
-        context4  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA2019_2020, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers) 
+        context3  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA1980_2020, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
+        context4  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA2020_2021, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers) 
 
         for context in [context1, context2, context3, context4]:  ### contexts with daily values
             finalDate = context.daily.getFinalDateYr();

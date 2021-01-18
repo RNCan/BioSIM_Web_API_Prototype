@@ -1,5 +1,5 @@
 open ftp://anonymous:anonymous.com@ftp.cfl.scf.rncan.gc.ca
 cd "/regniere/Data11/Weather/Daily"
 lcd "Weather/DailyDump"
-get "Canada-USA_2019-2020.zip"
+get "Canada-USA_2020-2021.zip"
 exit
