@@ -1,3 +1,9 @@
 include LICENSE README.txt
 graft biosim/biosimdll
 graft biosim/models
+graft biosim/data/DEM
+graft biosim/data/Layers
+include biosim/data/Mise_a_jour_meteo.bat
+include biosim/data/Mise_a_jour_meteo.txt
+include biosim/data/WinSCP.exe
+
