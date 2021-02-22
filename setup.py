@@ -1,14 +1,15 @@
 '''
 Created on 8-Oct-2020
 
-@author: Mathieu Fortin
+@author: M. Fortin and R. Saint-Amant, Canadian Forest Service, August 2020
+@copyright: Her Majesty the Queen in right of Canada
 '''
 from setuptools import find_packages
 from setuptools import setup
 
 setup(
     name="biosim",
-    version="1.0.5",
+    version="1.0.6",
     url="https://sourceforge.net/p/mrnfforesttools/biosimclient/wiki/MainPage/",
     license="LGPL 3.0",
     maintainer="Mathieu Fortin",
