@@ -174,6 +174,8 @@ class Server:
         if Settings.ProductionMode:    
             print("Initiating updater thread...")
             UpdaterThread(self)
+        else:
+            print("Updater thread disabled.")
         print("Server initialized!")
     
     def getWrapperForWeatherGeneration(self, request : WeatherGeneratorRequest):

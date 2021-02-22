@@ -36,9 +36,9 @@ def do_job(context : Context, tasks_to_accomplish : Queue, tasks_that_are_done :
     tasks_that_are_done.put(msg)
     if msg != "Success":
         return ### we get out of the process, the msg has been sent to the main thread anyway
-    else:
-        if Settings.Verbose == True:
-            print("Successfully loaded context: " + context.getContextName())
+#     else:
+#         if Settings.Verbose == True:
+#             print("Successfully loaded context: " + context.getContextName())
     
     while True:
         try:
@@ -73,6 +73,8 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
             self.tasksToDo = Queue()
             self.tasksDone = Queue()
             self.processes = self.initializeProcesses(context, self.tasksToDo, self.tasksDone)
+            if Settings.Verbose == True:
+                print("Successfully loaded context: " + context.getContextName() + " (" + str(len(self.processes)) + " processes)")
         else:
             self.WG = BioSIM_API.WeatherGenerator(context.getContextName())
             initializationString = context.getInitializationString()
@@ -82,6 +84,7 @@ class BioSimNormalsAndWeatherGeneratorWrapper:
             else:
                 if Settings.Verbose == True:
                     print("Successfully loaded context: " + context.getContextName())
+
 
     def initializeProcesses(self, context : Context, tasksToDo : Queue, tasksDone : Queue):
         processes = []

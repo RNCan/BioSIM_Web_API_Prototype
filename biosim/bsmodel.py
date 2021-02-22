@@ -33,10 +33,7 @@ def do_job(jobId, modelType : ModelType, tasks_to_accomplish : Queue, tasks_that
         tasks_that_are_done.put(innerModel.GetWeatherVariablesNeeded())
         tasks_that_are_done.put(innerModel.GetDefaultParameters())
         tasks_that_are_done.put(innerModel.Help())
-        if msg == "Success":
-            if Settings.Verbose == True:
-                print("Successfully loaded context: " + modelType.getName())
-        else:
+        if msg != "Success":
             raise Exception("Error: Failed to initialize model " + modelType.getName() + " - " + msg);
     
     while True:
@@ -74,6 +71,8 @@ class Model():
             self.climateVariableNeeded = self.tasksDone.get().split("+")
             self.defaultParameters = self.tasksDone.get().split("+")
             self.help = self.tasksDone.get()
+            if Settings.Verbose == True:
+                print("Successfully loaded model: " + modelType.getName() + " (" + str(len(self.processes)) + " processes)")
         else:
             self.innerModel = BioSIM_API.Model("Context name");
             initializationString = "Model=" + modelType.getPath();
@@ -84,7 +83,7 @@ class Model():
             self.help = self.innerModel.Help()
             if msg == "Success":
                 if Settings.Verbose == True:
-                    print("Successfully loaded context: " + modelType.getName())
+                    print("Successfully loaded model: " + modelType.getName())
             else:
                 raise Exception("Error: Failed to initialize model " + modelType.getName() + " - " + msg);
                     
