@@ -31,6 +31,7 @@ class BsFlaskRoutes():
         print("Multiprocessing set to " + str(app.config["MULTIPROCESS_MODE"]))
         print("Minimal configuration set to " + str(app.config["MINIMAL_CONFIG"]))
         Settings.setSettings(app.config)
+        Settings.updateGribsRegistry()
         
         Server.InstantiateServer()
                 
