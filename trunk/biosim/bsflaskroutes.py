@@ -22,9 +22,15 @@ FieldSeparator = ","
 class BsFlaskRoutes():
     
     @staticmethod
-    def create_app(test_config=None):
-        app = Flask(__name__, instance_relative_config=True)
+    def create_app():
+        app = Flask(__name__)
+        app.config.from_object('biosim.default_settings')
+        app.config.from_envvar('BIOSIM_SETTINGS', silent=True)
+        print("Production mode set to " + str(app.config["PRODUCTION_MODE"]))
+        print("Multiprocessing set to " + str(app.config["MULTIPROCESS_MODE"]))
+        Settings.setSettings(app.config)
         
+        Server.InstantiateServer()
                 
         @app.route('/BioSimMemoryLoad')
         def biosimMemoryLoad():

@@ -14,14 +14,25 @@ import os
 
 class Settings():
     
-#    SimpleMode = False   ### true: without multiprocessing false: with multiprocessing   
     Verbose = True
-    ProductionMode = True
-    MultiprocessMode = True
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
+    ProductionMode = False 
+    MultiprocessMode = False
     nbMaxCoordinatesNormals = 50
     nbMaxCoordinatesWG = 10
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
+    '''
+    Set the settings of the API. 
+    @param d: the app.config dictionary 
+    '''
+    @staticmethod
+    def setSettings(d : dict):  
+        Settings.Verbose = d["VERBOSE"]
+        Settings.ProductionMode = d["PRODUCTION_MODE"]
+        Settings.MultiprocessMode = d["MULTIPROCESS_MODE"]
+        Settings.nbMaxCoordinatesNormals = d["NB_MAX_COORDINATES_NORMALS"]
+        Settings.nbMaxCoordinatesWG = d["NB_MAX_COORDINATES_WG"]
+ 
 
 class CurrentDaily(Enum):
     Simple = "DailyLatest"
