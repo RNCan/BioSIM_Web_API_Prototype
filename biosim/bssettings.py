@@ -8,6 +8,7 @@ Provides different enums
 '''
 from enum import Enum
 from math import floor
+from nt import listdir, write
 from os import path
 import os
 
@@ -43,8 +44,26 @@ class Settings():
             Settings.UpdaterEnabled = d["UPDATER_ENABLED"]
         if d.__contains__("MINIMAL_CONFIG"):
             Settings.MinimalConfiguration = d["MINIMAL_CONFIG"]
- 
 
+    @staticmethod
+    def updateGribsRegistry():
+        if Settings.Verbose:
+            print("Updating Gribs registry...")
+        gribsPath = Settings.ROOT_DIR + "data" + path.sep + "Weather" + path.sep + "Gribs";
+        allTIFFiles = [f for f in listdir(gribsPath) if f.lower().endswith(".tif")]
+        gribsRegistry = open(gribsPath + path.sep + "HRDPS daily.Gribs", "w")
+        gribsRegistry.write("TRef,FilePath\n")
+        for f in allTIFFiles:
+            year = f[7:11]
+            month = f[11:13]
+            day = f[13:15]
+            gribsRegistry.write(year + "-" + month + "-" + day + ",." + path.sep + f + "\n")
+        gribsRegistry.close()
+        if Settings.Verbose:
+            print("Gribs registry successfully updated!")
+        
+        
+        
 class CurrentDaily(Enum):
     Simple = "DailyLatest"
     Alternative = "DailyLatestAlt"
@@ -358,7 +377,7 @@ class DEM(Enum):
 
 
 class Gribs(Enum):
-    HRDPS_daily_2019 = "HRDPS daily 2019.Gribs"
+    HRDPS_daily = "HRDPS daily.Gribs"
 
     def getCommand(self):
         return "Gribs=" + Settings.ROOT_DIR + "data" + path.sep + "Weather" + path.sep + "Gribs" + path.sep + self.value

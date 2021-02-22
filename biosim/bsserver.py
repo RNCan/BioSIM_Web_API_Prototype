@@ -81,38 +81,38 @@ class Server:
         self.normals.__setitem__(RCP.RCP85, self.setClimateModelsInDict(True)) ### true a dict and not a list
         
         for norm in pastClimateNormals:
-            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
             wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
             self.normals.get(RCP.PastClimate).__setitem__(context.normals.getShortNormals(), wrapper)
 
         for norm in rcm445:
-            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
             wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
             self.normals.get(RCP.RCP45).get(ClimateModel.RCM4).__setitem__(context.normals.getShortNormals(), wrapper)
 
         if Settings.MinimalConfiguration == False:            
             for norm in hadley45:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.normals.get(RCP.RCP45).get(ClimateModel.Hadley).__setitem__(context.normals.getShortNormals(), wrapper)
             
             for norm in hadley85:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.normals.get(RCP.RCP85).get(ClimateModel.Hadley).__setitem__(context.normals.getShortNormals(), wrapper)
    
             for norm in rcm485:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.normals.get(RCP.RCP85).get(ClimateModel.RCM4).__setitem__(context.normals.getShortNormals(), wrapper)
     
             for norm in gcm445:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.normals.get(RCP.RCP45).get(ClimateModel.GCM4).__setitem__(context.normals.getShortNormals(), wrapper)
     
             for norm in gcm485:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.normals.get(RCP.RCP85).get(ClimateModel.GCM4).__setitem__(context.normals.getShortNormals(), wrapper)
         
@@ -123,10 +123,10 @@ class Server:
         self.weatherGen.__setitem__(RCP.RCP45, self.setClimateModelsInDict(False)) ### false a list and not a dict
         self.weatherGen.__setitem__(RCP.RCP85, self.setClimateModelsInDict(False)) ### false a list and not a dict
  
-        context1  = Context(Shore.Shore1, Normals.CanUSA1941_1970, Daily.CanUSA1900_1950, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
-        context2  = Context(Shore.Shore1, Normals.CanUSA1951_1980, Daily.CanUSA1950_1980, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
-        context3  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA1980_2020, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
-        context4  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA2020_2021, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers) 
+        context1  = Context(Shore.Shore1, Normals.CanUSA1941_1970, Daily.CanUSA1900_1950, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
+        context2  = Context(Shore.Shore1, Normals.CanUSA1951_1980, Daily.CanUSA1950_1980, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
+        context3  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA1980_2020, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
+        context4  = Context(Shore.Shore1, Normals.CanUSA1981_2010, Daily.CanUSA2020_2021, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers) 
 
         if Settings.MinimalConfiguration:
             contexts = [context3, context4]
@@ -141,43 +141,43 @@ class Server:
             self.weatherGen.get(RCP.PastClimate).append(wrapper)
         
         for norm in pastClimateNormals:         ### those serve for the climate generation. The wrapper for the normals dict cannot be used since the weather generation interferes with the normals
-            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
             wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
             self.weatherGen.get(PastClimateGeneration).append(wrapper)
         
         for norm in rcm445:
-            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
+            context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
             wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
             self.weatherGen.get(RCP.RCP45).get(ClimateModel.RCM4).append(wrapper)
 
         if Settings.MinimalConfiguration == False:
             for norm in hadley45:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP45).get(ClimateModel.Hadley).append(wrapper)
             
             for norm in hadley85:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP85).get(ClimateModel.Hadley).append(wrapper)
     
             for norm in rcm445:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP45).get(ClimateModel.RCM4).append(wrapper)
     
             for norm in rcm485:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019, nbProcesses=self.nbProcessesForWrappers)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily, nbProcesses=self.nbProcessesForWrappers)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP85).get(ClimateModel.RCM4).append(wrapper)
     
             for norm in gcm445:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP45).get(ClimateModel.GCM4).append(wrapper)
     
             for norm in gcm485:
-                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily_2019)
+                context = Context(Shore.Shore1, norm, None, DEM.WorldWide30sec, Gribs.HRDPS_daily)
                 wrapper = BioSimNormalsAndWeatherGeneratorWrapper(context)
                 self.weatherGen.get(RCP.RCP85).get(ClimateModel.GCM4).append(wrapper)
         
