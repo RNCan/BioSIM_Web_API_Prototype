@@ -19,6 +19,8 @@ class Settings():
     MultiprocessMode = False
     nbMaxCoordinatesNormals = 50
     nbMaxCoordinatesWG = 10
+    UpdaterEnabled = False
+    MinimalConfiguration = True
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
     '''
@@ -27,11 +29,20 @@ class Settings():
     '''
     @staticmethod
     def setSettings(d : dict):  
-        Settings.Verbose = d["VERBOSE"]
-        Settings.ProductionMode = d["PRODUCTION_MODE"]
-        Settings.MultiprocessMode = d["MULTIPROCESS_MODE"]
-        Settings.nbMaxCoordinatesNormals = d["NB_MAX_COORDINATES_NORMALS"]
-        Settings.nbMaxCoordinatesWG = d["NB_MAX_COORDINATES_WG"]
+        if d.__contains__("VERBOSE"):
+            Settings.Verbose = d["VERBOSE"]
+        if d.__contains__("PRODUCTION_MODE"):
+            Settings.ProductionMode = d["PRODUCTION_MODE"]
+        if d.__contains__("MULTIPROCESS_MODE"):
+            Settings.MultiprocessMode = d["MULTIPROCESS_MODE"]
+        if d.__contains__("NB_MAX_COORDINATES_NORMALS"):
+            Settings.nbMaxCoordinatesNormals = d["NB_MAX_COORDINATES_NORMALS"]
+        if d.__contains__("NB_MAX_COORDINATES_WG"):
+            Settings.nbMaxCoordinatesWG = d["NB_MAX_COORDINATES_WG"]
+        if d.__contains__("UPDATER_ENABLED"):
+            Settings.UpdaterEnabled = d["UPDATER_ENABLED"]
+        if d.__contains__("MINIMAL_CONFIG"):
+            Settings.MinimalConfiguration = d["MINIMAL_CONFIG"]
  
 
 class CurrentDaily(Enum):

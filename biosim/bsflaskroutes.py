@@ -22,12 +22,14 @@ FieldSeparator = ","
 class BsFlaskRoutes():
     
     @staticmethod
-    def create_app():
+    def create_app(allowEnvironmentalSettings = True):
         app = Flask(__name__)
         app.config.from_object('biosim.default_settings')
-        app.config.from_envvar('BIOSIM_SETTINGS', silent=True)
+        if allowEnvironmentalSettings:
+            app.config.from_envvar('BIOSIM_SETTINGS', silent=True)
         print("Production mode set to " + str(app.config["PRODUCTION_MODE"]))
         print("Multiprocessing set to " + str(app.config["MULTIPROCESS_MODE"]))
+        print("Minimal configuration set to " + str(app.config["MINIMAL_CONFIG"]))
         Settings.setSettings(app.config)
         
         Server.InstantiateServer()

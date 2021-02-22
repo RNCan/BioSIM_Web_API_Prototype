@@ -21,15 +21,12 @@ from waitress import serve
 from biosim.bsflaskroutes import BsFlaskRoutes
 
 if __name__ == "__main__":
-    Settings.ProductionMode = False   
-    Settings.MultiprocessMode = False
     print("Name set to " + str(__name__))
-    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
-    Server.InstantiateServer()                               
-    serve(TransLogger(BsFlaskRoutes.create_app(), setup_console_handler=True), listen='0.0.0.0:5001', ident="biosim")
+    app = BsFlaskRoutes.create_app()                
+    url = "0.0.0.0:" + str(app.config["PORT"])
+    serve(TransLogger(app, setup_console_handler=True), listen=url, ident="BioSIM web API") 
 elif __name__ == "__biosim__":
-    Settings.ProductionMode = False   
-    Settings.MultiprocessMode = False
     print("Name set to " + str(__name__))
-    print("Multiprocessing set to " + str(Settings.MultiprocessMode))
-    Server.InstantiateServer()                               
+    app = BsFlaskRoutes.create_app(allowEnvironmentalSettings=False)       ## to make sure it does not work in multiprocess         
+    url = "0.0.0.0:" + str(app.config["PORT"])
+    serve(TransLogger(app, setup_console_handler=True), listen=url, ident="BioSIM web API") 
