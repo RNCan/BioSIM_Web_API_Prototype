@@ -281,7 +281,7 @@ class SimpleModelRequest(AbstractRequest):
     def areAllParametersThere(self, d:ImmutableMultiDict):
         if d.__contains__("model"):
                 return;
-        raise BioSimRequestException("An SimpleModelRequest must at least include model=")
+        raise BioSimRequestException("A SimpleModelRequest must at least include model=")
 
     def checkParmsValues(self, d:dict):
         errMsg = ""
