@@ -1,0 +1,4 @@
+Download file 
+Monde_30s(SRTM30).tif
+From
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/DEM/
