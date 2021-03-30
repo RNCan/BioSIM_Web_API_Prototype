@@ -1,0 +1,25 @@
+Download files
+Canada-USA_1941-1970.zip
+Canada-USA_1951-1980.zip
+Canada-USA_1961-1990.zip
+Canada-USA_1971-2000.zip
+From 
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Normals/past/
+
+Download file
+Canada-USA_1981-2010.zip
+From 
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Normals/
+
+Download files
+Canada-USA_1991-2100_Hadley_GEM2-ES.7z
+Canada-USA_1991-2100_CCC_GCM4-ESM2.7z
+Canada-USA_1991-2100_CCC_RCM4-ESM2.7z
+From
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Normals/ClimateChange/
+
+
+Extract the content of these zip files in the Normals folder
+
+IMPORTANT: 7-zip will probably unzip the files into a subfolder. Make sure to move all the files into the Normals folder. 
+In the end, the Normals should not contain any subdirectory, but just files.

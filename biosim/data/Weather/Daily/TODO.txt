@@ -1,0 +1,14 @@
+Download files
+Canada-USA_1900-1950.zip
+Canada-USA_1951-1980.zip
+Canada-USA_1980-2020.zip
+From 
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Daily/
+
+IMPORTANT
+Extract the content of these zip files directly in the Daily folder. 
+Do not keep them in a default subfolder, e.g., ./Canada-USA_1900-1950/ folder.
+Extracting the Canada-USA_1900-1950.zip file should produce three items in the Daily folder:
+	- Canada-USA 1900-1950D (subfolder)
+	- Canada-USA 1900-1950.DailyDB (file)
+	- Canada-USA 1900-1950.DailyHdr.csv (file)

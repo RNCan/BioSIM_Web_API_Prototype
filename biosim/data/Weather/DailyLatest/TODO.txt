@@ -1,0 +1,14 @@
+Download file
+Canada-USA_2020-2021.zip
+From 
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Daily/
+
+IMPORTANT
+Extract the content of these zip files directly in the Daily folder. 
+Do not keep them in a default subfolder, e.g., ./Canada-USA_2020-2021/ folder.
+Extracting the Canada-USA_2020-2021.zip file should produce five items in the DailyLatest folder:
+	- Canada-USA 2020-2021D (subfolder)
+	- Canada-USA 2020-2021.DailyDB (file)
+	- Canada-USA 2020-2021.DailyHdr.csv (file)
+	- Canada-USA 2020-2021.Dzop (file)
+	- Canada-USA 2020-2021.DzopData (file)
