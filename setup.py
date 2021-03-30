@@ -9,8 +9,8 @@ from setuptools import setup
 
 setup(
     name="biosim",
-    version="1.0.6",
-    url="https://sourceforge.net/p/mrnfforesttools/biosimclient/wiki/MainPage/",
+    version="1.0.7",
+    url="https://sourceforge.net/p/mrnfforesttools/biosimclient/wiki/BioSIM%20Web%20API/",
     license="LGPL 3.0",
     maintainer="Mathieu Fortin",
     maintainer_email="mathieu.fortin.re@gmail.com",
