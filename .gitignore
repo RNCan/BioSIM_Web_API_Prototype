@@ -1,0 +1,6 @@
+env/
+.vs/
+biosim/data/
+temp/
+biosim/__pycache__/**/*
+biosim/biosimdll/__pycache__/**/*
