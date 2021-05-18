@@ -1,16 +1,16 @@
 include LICENSE README.txt
 graft biosim/biosimdll
 graft biosim/models
-graft biosim/data/DEM
-graft biosim/data/Layers
 include biosim/data/Mise_a_jour_meteo.bat
 include biosim/data/Mise_a_jour_meteo.txt
 include biosim/data/WinSCP.exe
-include biosim/data/Weather/Daily/DELETE.txt
+include biosim/data/DEM/TODO.txt
+include biosim/data/Layers/TODO.txt
+include biosim/data/Weather/Daily/TODO.txt
 include biosim/data/Weather/DailyDump/DELETE.txt
-include biosim/data/Weather/DailyLatest/DELETE.txt
+include biosim/data/Weather/DailyLatest/TODO.txt
 include biosim/data/Weather/DailyLatestAlt/DELETE.txt
-include biosim/data/Weather/Gribs/DELETE.txt
-include biosim/data/Weather/Normals/DELETE.txt
+include biosim/data/Weather/Gribs/TODO.txt
+include biosim/data/Weather/Normals/TODO.txt
 
 

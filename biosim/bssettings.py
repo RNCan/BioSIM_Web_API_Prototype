@@ -370,7 +370,7 @@ class Daily(Enum):
     
         
 class DEM(Enum):
-    WorldWide30sec = "Monde 30s(SRTM30).tif"
+    WorldWide30sec = "Monde_30s(SRTM30).tif"
     
     def getCommand(self):
         return "DEM=" + Settings.ROOT_DIR + "data" + path.sep + "DEM" + path.sep + self.value

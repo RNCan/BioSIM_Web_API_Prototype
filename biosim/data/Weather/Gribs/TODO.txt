@@ -1,0 +1,4 @@
+Download at least one .tif file 
+From
+a subfolder of
+ftp://ftp.cfl.scf.rncan.gc.ca/regniere/Data11/Weather/Gribs/Daily/
